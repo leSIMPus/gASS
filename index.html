@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ФинГаз</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="game-container">
+    <img id="finn" src="assets/finn.png" alt="Финн">
+    <img id="gaspi" src="assets/gaspi.png" alt="Газпи">
+    <div id="dialogue-box"></div>
+
+    <div id="dialogue-box">
+        <div id="speaker-name"></div> <!-- Имя говорящего сверху -->
+        <div id="dialogue-text"></div> <!-- Текст диалога -->
+    </div>
+
+    <div id="name-popup">
+        <p>Введите своё имя:</p>
+        <input type="text" id="player-name" placeholder="Ваше имя">
+        <button id="name-btn">Начать</button>
+    </div>
+
+    <div id="popup" style="display:none;">
+        <p>Готовы ли вы начать своё финансовое путешествие?</p>
+        <button id="start-btn">Конечно!</button>
+    </div>
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
