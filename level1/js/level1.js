@@ -619,7 +619,13 @@ document.addEventListener('DOMContentLoaded', () => {
   quizClose.addEventListener('click', () => quizModal.setAttribute('aria-hidden', 'true'));
 
   // result close
-  closeResult.addEventListener('click', () => resultModal.setAttribute('aria-hidden', 'true'));
+  closeResult.addEventListener('click', () => {
+  resultModal.setAttribute('aria-hidden', 'true');
+  // Добавляем переход на уровень 2 после небольшой паузы
+  setTimeout(() => {
+    window.location.href = 'level2.html';
+  }, 500);
+});
 
   // init
   initBoard();
@@ -627,4 +633,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // expose for debug (optional)
   window._fg = { grid, checkFlow };
+
 });
