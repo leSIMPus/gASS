@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ФинГаз — Приветствие</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main class="center">
+    <section class="welcome-card" aria-labelledby="welcomeTitle">
+        <!-- Персонаж: замените содержимое .char-img на <img> когда будет арт -->
+        <div class="char-img" id="finnImg" aria-hidden="true">
+            <span>Ф</span>
+        </div>
+
+        <div class="welcome-content">
+            <h1 id="welcomeTitle" class="title">Приветствую!</h1>
+
+            <div class="greeting-row">
+                <div id="greetingText" class="greeting">Я Финн — хранитель знаний о финансах и их законах.</div>
+            </div>
+
+            <!-- Отображение / редактирование имени -->
+            <div id="nameControls" class="name-controls" aria-live="polite">
+                <div id="nameDisplay" class="name-display" hidden></div>
+                <button id="editNameBtn" class="btn ghost" hidden>Изменить</button>
+            </div>
+
+            <form id="nameForm" class="name-form" autocomplete="off" novalidate>
+                <label for="nameInput" class="sr-only">Имя игрока</label>
+                <input id="nameInput" class="input" type="text" maxlength="24" placeholder="Введите имя" />
+                <div class="name-actions">
+                    <button type="button" id="saveNameBtn" class="btn">Сохранить</button>
+                    <button type="button" id="skipNameBtn" class="btn ghost">Продолжить без имени</button>
+                </div>
+            </form>
+
+            <!-- Диалог / инструкции -->
+            <div id="dialogBox" class="dialog" role="region" aria-label="Инструкция Финна">
+                <div class="dialog-text" id="dialogText"></div>
+                <div class="dialog-actions">
+                    <button id="nextDialogBtn" class="btn">Далее</button>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Модальное стартовое окно -->
+<div id="startModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true">
+    <div class="modal-content">
+        <p class="modal-text">Готовы ли вы начать своё финансовое путешествие?</p>
+        <div class="modal-actions">
+            <button id="startBtn" class="btn">Конечно</button>
+        </div>
+    </div>
+</div>
+
+<script src="js/index.js"></script>
+<script src="js/level1.js"></script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>FinGas — Уровень 1</title>
+    <link rel="stylesheet" href="css/level1.css">
+</head>
+<body>
+<header class="hud">
+    <div class="hud-item">Игрок: <span id="playerName">Игрок</span></div>
+    <div class="hud-item">ФинГаз: <span id="finGas">100</span></div>
+    <div class="hud-item">Рублики: <span id="rubles">0</span></div>
+</header>
+
+<main class="game-area">
+    <!-- Боковая панель -->
+    <aside class="side-panel">
+        <div class="character">
+            <div class="char-img">Ф</div>
+            <div class="char-name">Финн</div>
+        </div>
+
+        <div class="dialog-box">
+            <p id="dialogText">Привет! Я Финн — хранитель знаний о финансах.</p>
+            <div style="display:flex;gap:8px;margin-top:8px">
+                <button id="nextBtn" class="btn">Далее</button>
+                <button id="hintBtn" class="btn ghost" title="Подсказка (платно)">Подсказка</button>
+            </div>
+        </div>
+
+        <!-- Панель выбора трубы -->
+        <div id="pipeChoice" class="pipe-choice">
+            <p>Выберите трубу:</p>
+            <button class="btn" data-type="h" onclick="choosePipe('h')">━</button>
+            <button class="btn" data-type="v" onclick="choosePipe('v')">┃</button>
+            <button class="btn" data-type="ul" onclick="choosePipe('ul')">┐</button>
+            <button class="btn" data-type="ur" onclick="choosePipe('ur')">┌</button>
+            <button class="btn" data-type="dl" onclick="choosePipe('dl')">┘</button>
+            <button class="btn" data-type="dr" onclick="choosePipe('dr')">└</button>
+        </div>
+
+    </aside>
+
+    <!-- Игровое поле -->
+    <section class="board-container">
+        <div id="board" class="board" aria-label="Игровое поле"></div>
+
+        <!-- Анимация Газпи -->
+        <div id="gazpi" class="gazpi" aria-hidden="true">+10 ₽</div>
+    </section>
+</main>
+
+<!-- Модалка с квизом -->
+<div id="quizModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+        <h3>Мошенник</h3>
+        <p id="quizQuestion">Кто-то звонит и просит данные карты. Что делать?</p>
+        <div class="answers" id="quizAnswers"></div>
+        <div style="margin-top:10px"><button id="quizClose" class="btn ghost">Отмена</button></div>
+    </div>
+</div>
+
+<!-- Итог -->
+<div id="resultModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+        <h3>Уровень завершён</h3>
+        <p id="resultNote"></p>
+        <div style="margin-top:12px"><button id="closeResult" class="btn">ОК</button></div>
+    </div>
+</div>
+
+<script src="js/level1.js"></script>
+</body>
+</html>
