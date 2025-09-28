@@ -1,10 +1,13 @@
-body, html {
+body {
   margin: 0;
   padding: 0;
-  height: 100%;
-  font-family: Arial, sans-serif;
-  user-select: none;
-  background: linear-gradient(to bottom right, #003399, #ff6600);
+  height: 100vh;
+  background: #4075FC url('assets/background2.png') no-repeat center center;
+  background-size: contain;
+}
+
+body {
+  font-family: 'Roboto', Arial, sans-serif;
 }
 
 #game-container {
@@ -16,7 +19,6 @@ body, html {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(to bottom right, #003399, #ff6600);
 }
 
 #dialogue-box {
@@ -24,13 +26,31 @@ body, html {
   bottom: 0;
   width: 100%;
   padding: 20px;
-  background: rgba(0,0,0,0.5);
+  background: rgba(255, 255, 255);
   min-height: 150px;
   box-sizing: border-box;
   word-wrap: break-word;
   overflow-wrap: break-word;
   cursor: pointer;
+  border: 4px solid;
+  border-image-slice: 1;
+  border-image-source: linear-gradient(45deg, #ff6600, #003399, #a64ca6, #ff4db8);
+  animation: pulseBorder 3s infinite alternate;
 }
+
+/* Анимация рамки */
+@keyframes pulseBorder {
+  0% {
+    border-image-source: linear-gradient(45deg, #ff6600, #003399, #a64ca6, #ff4db8);
+  }
+  50% {
+    border-image-source: linear-gradient(45deg, #ff4db8, #a64ca6, #003399, #ff6600);
+  }
+  100% {
+    border-image-source: linear-gradient(45deg, #003399, #ff6600, #ff4db8, #a64ca6);
+  }
+}
+
 
 #speaker-name {
   font-weight: bold;
@@ -41,7 +61,7 @@ body, html {
 #dialogue-text {
   font-size: 18px;
   line-height: 1.5;
-  color: white; /* по умолчанию, JS меняет цвет под спикера */
+  color: black;
 }
 
 #name-popup, #popup {
@@ -61,6 +81,11 @@ body, html {
   box-shadow: 0 4px 15px rgba(0,0,0,0.3);
 }
 
+#popup p {
+  text-align: center;
+  width: 100%;
+}
+
 #name-popup input {
   padding: 10px;
   margin-top: 10px;
@@ -70,11 +95,12 @@ body, html {
   border-radius: 6px;
 }
 
-#name-popup button, #popup button {
-  margin-top: 15px;
+#popup button {
+  display: block;
+  margin: 20px auto 0 auto;
   padding: 10px 20px;
   font-size: 16px;
-  background: linear-gradient(45deg, #003399, #ff6600);
+  background: linear-gradient(#4075FC, #FF7801);
   border: none;
   border-radius: 8px;
   cursor: pointer;
@@ -82,30 +108,36 @@ body, html {
   font-weight: bold;
   transition: opacity 0.2s;
 }
+#name-popup button, #popup button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  background: linear-gradient(#4075FC, #FF7801);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  color: white;
+  font-weight: bold;
+  transition: opacity 0.2s;
+  align-self: center;
+}
 
 #name-popup button:hover, #popup button:hover {
   opacity: 0.9;
 }
 
-#finn, #gaspi {
+#finn {
   position: absolute;
   bottom: 0;
 }
 
 #finn {
-  width: 300px; /* подбираем размер под экран */
-  bottom: 150px; /* отступ над диалогом */
+  width: 300px;
+  bottom: 150px;
   left: 50%;
   transform: translateX(-50%);
 }
 
-#gaspi {
-  width: 350px;
-  bottom: 350px; /* выше Финна */
-  left: 60%;
-  transform: translateX(-50%);
-  animation: float 2s infinite alternate;
-}
 
 @keyframes float {
   0% { transform: translateX(-50%) translateY(0); }
@@ -117,10 +149,58 @@ body, html {
   color: #ff6600;
 }
 
-.gaspi-text {
-  color: #00ccff;
+.game-text {
+  color: black;
 }
 
-.game-text {
-  color: white; /* для "Игры" */
+#лобняк
+
+#lobby {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#lobby-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 120px;
+    background: rgba(255,255,255);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
+}
+
+.lobby-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(#4075FC, #FF7801);
+    border: none;
+    border-radius: 12px;
+    padding: 10px;
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.lobby-btn img {
+    width: 36px;
+    height: 36px;
+    margin-bottom: 5px;
+}
+
+.lobby-btn:hover {
+    transform: scale(1.1);
+    opacity: 0.9;
 }

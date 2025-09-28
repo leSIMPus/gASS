@@ -5,16 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ФинГаз</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 <div id="game-container">
     <img id="finn" src="assets/finn.png" alt="Финн">
-    <img id="gaspi" src="assets/gaspi.png" alt="Газпи">
-    <div id="dialogue-box"></div>
-
     <div id="dialogue-box">
-        <div id="speaker-name"></div> <!-- Имя говорящего сверху -->
-        <div id="dialogue-text"></div> <!-- Текст диалога -->
+        <div id="speaker-name"></div>
+        <div id="dialogue-text"></div>
     </div>
 
     <div id="name-popup">
@@ -28,6 +26,22 @@
         <button id="start-btn">Конечно!</button>
     </div>
 </div>
+
+<div id="lobby" style="display: none;">
+    <!-- Нижняя панель -->
+    <div id="lobby-bar">
+        <button class="lobby-btn" id="level-btn">
+            <img src="assets/level-icon.png" alt="Выбрать уровень"><br>Уровень
+        </button>
+        <button class="lobby-btn" id="shop-btn">
+            <img src="assets/shop-icon.png" alt="Магазин"><br>Магазин
+        </button>
+        <button class="lobby-btn" id="leaderboard-btn">
+            <img src="assets/leaderboard-icon.png" alt="Лидерборд"><br>Лидерборд
+        </button>
+    </div>
+</div>
+
 
 <script src="game.js"></script>
 </body>
