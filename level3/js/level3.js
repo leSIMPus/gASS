@@ -1,4 +1,4 @@
-// level3.js — логика уровня 3 с белыми зонами
+el3.js — логика уровня 3 с белыми зонами
 document.addEventListener('DOMContentLoaded', () => {
   // DOM элементы
   const boardEl = document.getElementById('board');
@@ -302,11 +302,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Получение бонуса на белой зоне
   function collectWhiteBonus(cell) {
-    // Пример: +10 рублей и +1 газик
-    rubles += 10;
-    gaziksCollected += 1;
-    createFloatingText(cell, '+10 ₽', 'gold');
-    createFloatingText(cell, '+1 🔥', '#ff4500', 'gazik-floating');
+    // В белых зонах просто даем бонус без вопросов
+    rubles += 15;
+    gaziksCollected++;
+    createFloatingText(cell, '+15 ₽', 'gold');
+    createFloatingText(cell, '+1 🔥', '#2a7ade', 'gazik-floating');
 
     updateHUD();
     cell.classList.remove('white-zone');
@@ -387,10 +387,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 // Сбор газика — уровень 3
 function collectGazik(cell) {
-  // 50% шанс, что выпадет двойной газик
-  const bonus = Math.random() < 0.5 ? 10 : 5;
-  const count = bonus / 5;
-
   const product = BANK_PRODUCTS[Math.floor(Math.random() * BANK_PRODUCTS.length)];
   productInfo.innerHTML = `
     <h4>${product.name}</h4>
@@ -401,10 +397,9 @@ function collectGazik(cell) {
 
   productClose.onclick = () => {
     productModal.setAttribute('aria-hidden', 'true');
-    finGas += bonus;
-    gaziksCollected += count;
-    createFloatingText(cell, `+${bonus} 🔥`, '#2a7ade', 'gazik-floating');
-    if (count > 1) createFloatingText(cell, `+${count} Газика`, '#ff4500', 'gazik-floating');
+    finGas += 5;
+    gaziksCollected++;
+    createFloatingText(cell, '+5 🔥', '#2a7ade', 'gazik-floating');
     cell.classList.remove('gazik');
     spawnGazik();
     updateHUD();
@@ -412,9 +407,11 @@ function collectGazik(cell) {
   };
 }
 
+
 // Создание всплывающего текста — без изменений
 function createFloatingText(cell, text, color, className = '') {
   if (!cell) return;
+
   const floatingText = document.createElement('div');
   floatingText.textContent = text;
   floatingText.style.cssText = `
@@ -422,15 +419,19 @@ function createFloatingText(cell, text, color, className = '') {
     pointer-events: none;
     font-weight: 800;
     color: ${color};
-    font-size: 22px;
+    font-size: 20px;
     z-index: 100;
-    transition: transform 1s ease, opacity 1s ease;
+    transition: transform 0.9s ease, opacity 0.9s ease;
     opacity: 1;
   `;
-  if (className) floatingText.className = className;
+
+  if (className) {
+    floatingText.className = className;
+  }
 
   const rect = cell.getBoundingClientRect();
   const boardRect = boardEl.getBoundingClientRect();
+
   floatingText.style.left = (rect.left - boardRect.left + rect.width / 2) + 'px';
   floatingText.style.top = (rect.top - boardRect.top - 10) + 'px';
 
@@ -438,12 +439,16 @@ function createFloatingText(cell, text, color, className = '') {
 
   setTimeout(() => {
     floatingText.style.opacity = '0';
-    floatingText.style.transform = 'translateY(-80px)';
+    floatingText.style.transform = 'translateY(-70px)';
     setTimeout(() => {
-      if (floatingText.parentElement) floatingText.parentElement.removeChild(floatingText);
-    }, 1000);
+      if (floatingText.parentElement) {
+        floatingText.parentElement.removeChild(floatingText);
+      }
+    }, 900);
   }, 100);
 }
+
+
 
 // Проверка потока — без изменений, только увеличиваем скорость анимации
 function animateFlow(pathKeys) {
@@ -479,16 +484,24 @@ function checkFlow() {
     const k = `${nr},${nc}`;
     if (visited.has(k)) return;
     const neigh = getCell(nr, nc);
-    if (!neigh || !neigh.dataset.pipe) return;
+    if (!neigh) return;
     queue.push(k);
     prev.set(k, fromKey);
+  }
+
+  function canConnect(r, c, dirKey) {
+    const cell = getCell(r, c);
+    if (!cell) return false;
+    const type = cell.dataset.pipe;
+    if (!type) return false;
+    const dirs = TYPE_DEFS[type].dirs;
+    return dirs.includes(dirKey);
   }
 
   while (queue.length) {
     const key = queue.shift();
     if (visited.has(key)) continue;
     visited.add(key);
-
     const [r, c] = key.split(',').map(Number);
 
     if (r === goal.r && c === goal.c) {
@@ -498,8 +511,7 @@ function checkFlow() {
     }
 
     const curCell = getCell(r, c);
-    if (!curCell) continue;
-    const curType = curCell.dataset.pipe;
+    const curType = curCell ? curCell.dataset.pipe : null;
     if (!curType || !TYPE_DEFS[curType]) continue;
 
     for (const dirKey of TYPE_DEFS[curType].dirs) {
@@ -508,9 +520,16 @@ function checkFlow() {
       if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
       const neigh = getCell(nr, nc);
       if (!neigh) continue;
+
+      if (neigh.classList.contains('goal')) {
+        prev.set(goalKey, key);
+        const path = reconstructPath(prev, goalKey, startKey);
+        animateFlow(path);
+        return true;
+      }
+
       const neighType = neigh.dataset.pipe;
       if (!neighType) continue;
-
       const oppKey = OPP[dirKey];
       if (TYPE_DEFS[neighType].dirs.includes(oppKey)) {
         const nkey = `${nr},${nc}`;
@@ -521,7 +540,6 @@ function checkFlow() {
       }
     }
   }
-
   return false;
 }
 
@@ -641,6 +659,11 @@ function animateFlow(pathKeys) {
     i++;
   }, 180);
 }
+
+// Инициализация уровня 3
+initBoard();
+updateHUD();
+});
 
 // Инициализация уровня 3
 initBoard();
