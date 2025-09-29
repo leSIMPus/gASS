@@ -54,6 +54,7 @@ nameInput.addEventListener("keyup", (e) => {
 
 // Листание диалогов по тапу
 gameContainer.addEventListener("click", (e) => {
+    if(lobby.style.display !== "none") return;
     if(namePopup.style.display !== "none" || e.target.tagName === "BUTTON") return;
 
     if(typing) {
@@ -74,10 +75,66 @@ gameContainer.addEventListener("click", (e) => {
 
 startBtn.addEventListener('click', () => {
     popup.style.display = 'none';
-    document.getElementById('dialogue-box').style.display = 'none'; // скрываем весь диалог
-    document.getElementById('speaker-name').style.display = 'none';
-    document.getElementById('dialogue-text').style.display = 'none';
+
+    document.getElementById('dialogue-box').style.display = 'none';
     document.getElementById('finn').style.display = 'none';
-    document.getElementById('lobby').style.display = 'block';
-    document.getElementById('player-display').textContent = playerName;
+    namePopup.style.display = 'none';
+
+    lobby.style.display = 'block';
+
+});
+
+//выбор уровня
+const levelBtn = document.getElementById("level-btn");
+const levelPopup = document.getElementById("level-popup");
+const closeLevels = document.getElementById("close-levels");
+const levelButtons = document.querySelectorAll(".level-btn");
+
+// открыть окно выбора уровня
+levelBtn.addEventListener("click", () => {
+  levelPopup.style.display = "flex";
+});
+
+// закрыть окно
+closeLevels.addEventListener("click", () => {
+  levelPopup.style.display = "none";
+});
+
+// обработка выбора уровня
+levelButtons.forEach(btn => {
+  btn.addEventListener("click", () => {
+    const level = btn.dataset.level;
+    console.log(`Выбран уровень ${level}`);
+    // здесь потом подставим переход в конкретный уровень
+    levelPopup.style.display = "none";
+  });
+});
+
+const infoPopup = document.getElementById("info-popup");
+const closeInfoPopup = document.getElementById("close-info-popup");
+const shopBtn = document.getElementById("shop-btn");
+const leaderboardBtn = document.getElementById("leaderboard-btn");
+
+// открыть предупреждение
+shopBtn.addEventListener("click", () => {
+    infoPopup.style.display = "flex";
+});
+
+leaderboardBtn.addEventListener("click", () => {
+    infoPopup.style.display = "flex";
+});
+
+// закрыть предупреждение
+closeInfoPopup.addEventListener("click", () => {
+    infoPopup.style.display = "none";
+});
+
+//открытие уровней
+const levelBtns = document.querySelectorAll('.level-btn');
+
+levelBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const level = btn.dataset.level;
+    location.href = `level${level}/level${level}.html`;
+  });
 });

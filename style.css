@@ -169,11 +169,12 @@ body {
     left: 0;
     width: 100%;
     height: 120px;
-    background: rgba(255,255,255);
+    background: rgba(255,255,255,0.95); /* чуть прозрачный фон */
     display: flex;
     justify-content: space-around;
     align-items: center;
-    box-shadow: 0 -4px 10px rgba(0,0,0,0.3);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.4); /* сильнее тень */
+    border-radius: 20px 20px 0 0; /* скруглённые углы сверху */
 }
 
 .lobby-btn {
@@ -203,4 +204,90 @@ body {
 .lobby-btn:hover {
     transform: scale(1.1);
     opacity: 0.9;
+}
+
+/* выбор уровня */
+#level-popup {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 300px;
+  animation: fadeIn 0.3s ease;
+}
+
+#level-popup h2 {
+  margin-bottom: 20px;
+}
+
+#levels {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.level-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(#4075FC, #FF7801);
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.level-btn:hover {
+  transform: scale(1.1);
+  opacity: 0.9;
+}
+
+#close-levels {
+  margin-top: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #ccc;
+  cursor: pointer;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translate(-50%, -60%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+#info-popup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 30;
+}
+
+#info-popup-content p {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+#close-info-popup {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 8px;
+    background: #ccc;
+    cursor: pointer;
 }

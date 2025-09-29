@@ -166,13 +166,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // описание всех труб
   const TYPE_DEFS = {
-    h:  { sym: "━", dirs: ["l", "r"] },    // горизонталь
-    v:  { sym: "┃", dirs: ["t", "b"] },    // вертикаль
-    ul: { sym: "┐", dirs: ["l", "b"] },    // угол: вверх→лево
-    ur: { sym: "┌", dirs: ["r", "b"] },    // угол: вверх→право
-    dl: { sym: "┘", dirs: ["l", "t"] },    // угол: низ→лево
-    dr: { sym: "└", dirs: ["r", "t"] }     // угол: низ→право
+    H:  { dirs: ["l", "r"], img: "images/H.png" },
+    V:  { dirs: ["t", "b"], img: "images/V.png" },
+    LD: { dirs: ["l", "b"], img: "images/LD.png" },
+    RD: { dirs: ["r", "b"], img: "images/RD.png" },
+    LU: { dirs: ["l", "t"], img: "images/LU.png" },
+    UR: { dirs: ["r", "t"], img: "images/UR.png" }
   };
+
+
   // --- helper: безопасно получить массив направлений
   function getPipeDirsFromType(type) {
     if (!type) return [];
@@ -187,24 +189,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // отрисовка трубы (символы или картинки)
   function renderPipe(cell, type, opts = {}) {
-    if (!TYPE_DEFS[type]) {
+    const def = TYPE_DEFS[type];
+    if (!def) {
       console.warn('renderPipe: unknown type', type);
       return;
     }
+
     cell.dataset.pipe = type;
     cell.classList.add('has-pipe');
     cell.innerHTML = '';
-    const span = document.createElement('span');
-    span.className = 'pipe-sym';
-    span.textContent = TYPE_DEFS[type].sym;
-    cell.appendChild(span);
+
+    // создаём картинку
+    const img = document.createElement('img');
+    img.src = def.img;
+    img.alt = type;
+    img.className = 'pipe-img';
+    img.style.width = '100%';
+    img.style.height = '100%';
+    cell.appendChild(img);
 
     if (opts.fixed) {
       cell.classList.add('pipe-fixed');
       cell.dataset.pipeFixed = 'true';
     }
-  }
-
+}
 
   // util: get cell by coords safely
   function getCell(r, c) {
@@ -270,11 +278,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // start and goal
     const start = getCell(7, 0);
     start.classList.add('start');
-    renderPipe(start, 'h', { fixed: true });
+    renderPipe(start, 'H', { fixed: true });
 
     const goal = getCell(0, 4);
     goal.classList.add('goal');
-    renderPipe(goal, 'v', { fixed: true });
+    renderPipe(goal, 'V', { fixed: true });
 
 
 
