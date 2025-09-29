@@ -1,4 +1,3 @@
-// level2.js — логика уровня 2 с правильным сюжетом
 document.addEventListener('DOMContentLoaded', () => {
   // DOM элементы
   const boardEl = document.getElementById('board');
@@ -18,7 +17,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeResult = document.getElementById('closeResult');
   const dailyModal = document.getElementById('dailyModal');
   const closeDaily = document.getElementById('closeDaily');
+  const nextLevelBtn = document.getElementById('nextLevel'); // Новая кнопка
   const playerNameEl = document.getElementById('playerName');
+
+  // Новые элементы для обучающих модалок
+  const yellowZoneIntroModal = document.getElementById('yellowZoneIntroModal');
+  const yellowZoneIntroClose = document.getElementById('yellowZoneIntroClose');
+  const gazikIntroModal = document.getElementById('gazikIntroModal');
+  const gazikIntroClose = document.getElementById('gazikIntroClose');
 
   // состояние игры
   const rows = 8, cols = 5;
@@ -334,26 +340,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Введение про желтую зону (при первом входе на желтую зону)
   function showYellowZoneIntro(cell) {
     hasSeenYellowZoneIntro = true;
+    yellowZoneIntroModal.setAttribute('aria-hidden', 'false');
 
-    // Сохраняем текущий диалог
-    const currentDialog = dialogText.textContent;
-
-    dialogText.textContent = "Это желтая зона! Здесь тебе нужно ответить на вопросы по финансовой грамотности. Будь внимателен - неправильный ответ заберет часть твоего ФинГаза!";
-    nextBtn.disabled = false;
-    nextBtn.style.display = 'inline-block';
-    nextBtn.textContent = "Понятно";
-
-    const originalClick = nextBtn.onclick;
-
-    nextBtn.onclick = () => {
-      // Возвращаем оригинальное состояние
-      dialogText.textContent = currentDialog;
-      nextBtn.disabled = true;
-      nextBtn.style.display = 'none';
-      nextBtn.textContent = "Далее";
-      nextBtn.onclick = originalClick;
-
-      // Открываем квиз
+    yellowZoneIntroClose.onclick = () => {
+      yellowZoneIntroModal.setAttribute('aria-hidden', 'true');
       openFinanceQuiz(cell);
     };
   }
@@ -361,26 +351,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Введение про Газики (при первом входе на газик)
   function showGazikiIntro(cell) {
     hasSeenGazikiIntro = true;
+    gazikIntroModal.setAttribute('aria-hidden', 'false');
 
-    // Сохраняем текущий диалог
-    const currentDialog = dialogText.textContent;
-
-    dialogText.textContent = "О, видишь эти огонечки на экране? Это Газики – твои жизни, при потере ФинГаза ты теряешь и Газики. Периодически дополнительные Газики будут появляться на твоем экране. Чтобы получить их, нужно ознакомиться с другими продуктами банка или выполнить задания, также связанные с услугами банка.";
-    nextBtn.disabled = false;
-    nextBtn.style.display = 'inline-block';
-    nextBtn.textContent = "Понятно";
-
-    const originalClick = nextBtn.onclick;
-
-    nextBtn.onclick = () => {
-      // Возвращаем оригинальное состояние
-      dialogText.textContent = currentDialog;
-      nextBtn.disabled = true;
-      nextBtn.style.display = 'none';
-      nextBtn.textContent = "Далее";
-      nextBtn.onclick = originalClick;
-
-      // Открываем сбор газика
+    gazikIntroClose.onclick = () => {
+      gazikIntroModal.setAttribute('aria-hidden', 'true');
       collectGazik(cell);
     };
   }
@@ -677,6 +651,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Возвращаем в главное меню
     setTimeout(() => {
       window.location.href = 'index.html';
+    }, 500);
+  });
+
+  // Обработчик для перехода на следующий уровень
+  nextLevelBtn.addEventListener('click', () => {
+    dailyModal.setAttribute('aria-hidden', 'true');
+    // Переход на третий уровень
+    setTimeout(() => {
+      window.location.href = '.../level3.html';
     }, 500);
   });
 
