@@ -65,13 +65,12 @@ body {
   grid-template-rows: repeat(8, 1fr);
   gap: 0;
   padding: 0;
-  width: 90vmin;       /* поле будет квадратным и вписываться в экран */
-  height: 90vmin;
+  width: calc(100vh - 120px);
+  height: calc(100vh - 120px);
   max-width: 100%;
   max-height: 100%;
   background: #e9f7ff;
   border-radius: 12px;
-  margin: 0 auto;
   border: 2px solid rgba(0,0,0,0.05);
   box-shadow: 0 6px 20px rgba(0,0,0,0.05);
 }
@@ -405,4 +404,61 @@ body {
   background: #d6ecff;
   color: #0e2b36;
   font-weight: 900;
+}
+
+.cell.has-pipe {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+
+.cell.has-pipe img.pipe-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.cell.flow {
+  background: linear-gradient(180deg, rgba(0,195,255,0.12), rgba(0,195,255,0.06));
+  box-shadow: 0 6px 18px rgba(0,195,255,0.08);
+  color: var(--flow);
+}
+
+.cell.pipe-fixed {
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), 0 6px 18px rgba(0,0,0,0.04);
+}
+
+.modal { display: none; align-items: center; justify-content: center; }
+.modal[aria-hidden="false"] { display: flex; }
+
+.bonus-item {
+  margin: 8px 0;
+  padding: 6px;
+  background: #f0f8f0;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.cell.tutorial {
+  box-shadow: 0 0 0 3px var(--accent);
+  z-index: 10;
+}
+
+.gazik-floating {
+  color: #2a7ade !important;
+  text-shadow: 0 0 8px rgba(42, 122, 222, 0.7);
+  animation: float-text 1s ease-in-out;
+}
+
+@keyframes float-text {
+  0% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(-70px) scale(1);
+    opacity: 0;
+  }
 }
