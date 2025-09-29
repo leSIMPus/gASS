@@ -86,6 +86,36 @@
   </div>
 </div>
 
+<!-- Модалка с объяснением желтых зон -->
+<div id="yellowZoneIntroModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <h3>Желтая зона</h3>
+    <div class="product-info">
+      <p>Это желтая зона! Здесь тебе нужно ответить на вопросы по финансовой грамотности.</p>
+      <p>Будь внимателен - неправильный ответ заберет часть твоего ФинГаза!</p>
+      <p>Правильные ответы принесут тебе дополнительные Рублики.</p>
+    </div>
+    <div style="margin-top:10px">
+      <button id="yellowZoneIntroClose" class="btn">Понятно</button>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка с объяснением газиков -->
+<div id="gazikIntroModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <h3>Газики</h3>
+    <div class="product-info">
+      <p>О, видишь эти огонечки на экране? Это Газики – твои жизни!</p>
+      <p>При потере ФинГаза ты теряешь и Газики. Периодически дополнительные Газики будут появляться на твоем экране.</p>
+      <p>Чтобы получить их, нужно ознакомиться с другими продуктами банка или выполнить задания, также связанные с услугами банка.</p>
+    </div>
+    <div style="margin-top:10px">
+      <button id="gazikIntroClose" class="btn">Понятно</button>
+    </div>
+  </div>
+</div>
+
 <!-- Итог уровня -->
 <div id="resultModal" class="modal" aria-hidden="true">
   <div class="modal-content">
@@ -111,8 +141,9 @@
       <div class="reward-day"><span>День 6</span><br>+50 ₽</div>
       <div class="reward-day"><span>День 7</span><br>+100 ⚡ +100 ₽</div>
     </div>
-    <div style="margin-top:12px">
-      <button id="closeDaily" class="btn">Отлично!</button>
+    <div style="margin-top:12px; display: flex; gap: 10px; justify-content: center;">
+      <button id="closeDaily" class="btn ghost">На главную</button>
+      <button id="nextLevel" class="btn">Следующий уровень</button>
     </div>
   </div>
 </div>
