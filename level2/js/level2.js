@@ -183,6 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
         row.push(cell);
       }
       grid.push(row);
+      
     }
 
     // Старт и финиш
@@ -202,6 +203,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Обновление интерфейса
     updateHUD();
+    setTimeout(() => {
+    if (window.innerWidth <= 768) {
+      document.querySelector('.side-panel #pipeChoice')?.remove();
+    } else {
+      document.querySelector('.game-area #pipeChoice')?.remove();
+    }
+  }, 100);
+}
   }
 
   // Размещение желтых зон
