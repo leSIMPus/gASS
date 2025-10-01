@@ -13,7 +13,7 @@
   <div class="hud-item">Рублики: <span id="rubles">0</span></div>
 </header>
 
-<main class="game-area">
+  <main class="game-area">
   <!-- Боковая панель -->
   <aside class="side-panel">
     <div class="character">
@@ -28,16 +28,7 @@
         <button id="hintBtn" class="btn ghost" title="Подсказка (платно)">Подсказка</button>
       </div>
     </div>
-  </aside>
 
-  <!-- Игровое поле -->
-  <section class="board-container">
-    <div id="board" class="board" aria-label="Игровое поле"></div>
-
-    <!-- Анимационные элементы будут создаваться динамически -->
-  </section>
-  <div id="pipeChoice" class="pipe-choice">
-    
     <!-- Панель выбора трубы -->
     <div id="pipeChoice" class="pipe-choice">
       <p>Выберите трубу:</p>
@@ -62,8 +53,15 @@
         </button>
       </div>
     </div>
-  </div>
-</main>
+
+  </aside>
+
+  <!-- Игровое поле -->
+  <section class="board-container">
+    <div id="board" class="board" aria-label="Игровое поле"></div>
+
+    <!-- Анимационные элементы будут создаваться динамически -->
+  </section>
 </main>
 
 <!-- Модалка с финансовыми вопросами -->
