@@ -521,3 +521,258 @@ body {
     opacity: 0;
   }
 }
+
+/* Общие стили для боковых панелей */
+.side-panel-top, .side-panel-bottom {
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Десктопная версия */
+@media (min-width: 769px) {
+  .game-area {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .side-panel-top {
+    width: 280px;
+    display: block;
+  }
+
+  .side-panel-bottom {
+    display: none; /* Скрываем мобильную панель на десктопе */
+  }
+
+  .board-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+  }
+
+  /* Стили для выбора труб на десктопе */
+  .desktop-pipes {
+    margin-top: 16px;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background: #f8fbff;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  }
+
+  .desktop-pipes p {
+    margin: 0 0 12px;
+    font-weight: 600;
+    font-size: 15px;
+    color: #333;
+  }
+
+  .pipe-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .pipe-buttons img.pipe-img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    pointer-events: none;
+  }
+
+  .pipe-choice .btn {
+    min-height: 44px;
+    cursor: pointer;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background: #fff;
+    transition: all 0.2s ease;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+  }
+
+  .pipe-choice .btn:hover {
+    background: #e8f4ff;
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(42, 122, 222, 0.2);
+  }
+
+  .pipe-choice .btn.active {
+    border: 3px solid var(--accent);
+    background: #d6ecff;
+    color: #0e2b36;
+    font-weight: 900;
+  }
+}
+
+/* Мобильная версия */
+@media (max-width: 768px) {
+  .game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .side-panel-top {
+    width: 100%;
+    max-width: 380px;
+    order: 1; /* Диалоги Финна сверху */
+  }
+
+  .board-container {
+    order: 2; /* Игровое поле посередине */
+    width: 100%;
+  }
+
+  .side-panel-bottom {
+    display: block; /* Показываем мобильную панель */
+    width: 100%;
+    max-width: 380px;
+    order: 3; /* Выбор труб снизу */
+    margin-top: 10px;
+  }
+
+  /* Скрываем выбор труб в верхней панели на мобильных */
+  .desktop-pipes {
+    display: none;
+  }
+
+  /* Стили для мобильного выбора труб */
+  .mobile-pipes {
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background: #f8fbff;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  }
+
+  .mobile-pipes p {
+    margin: 0 0 12px;
+    font-weight: 600;
+    font-size: 15px;
+    color: #333;
+  }
+
+  /* Трубы в две строки на мобильных */
+  .pipe-buttons-mobile {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .pipe-buttons-mobile .btn {
+    min-height: 50px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background: #fff;
+    transition: all 0.2s ease;
+  }
+
+  .pipe-buttons-mobile .btn:hover {
+    background: #e8f4ff;
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(42, 122, 222, 0.2);
+  }
+
+  .pipe-buttons-mobile .btn.active {
+    border: 3px solid var(--accent);
+    background: #d6ecff;
+  }
+
+  .pipe-buttons-mobile .btn img.pipe-img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    pointer-events: none;
+  }
+}
+/* Мобильная панель выбора труб */
+.mobile-pipe-panel {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-pipe-panel {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    padding: 12px;
+    border-top: 2px solid #e0e0e0;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+  }
+
+  .pipe-choice-mobile p {
+    margin: 0 0 10px;
+    font-weight: 600;
+    font-size: 15px;
+    color: #333;
+    text-align: center;
+  }
+
+  .pipe-buttons-mobile {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .pipe-buttons-mobile .btn {
+    min-height: 50px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background: #fff;
+    transition: all 0.2s ease;
+  }
+
+  .pipe-buttons-mobile .btn:hover {
+    background: #e8f4ff;
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(42, 122, 222, 0.2);
+  }
+
+  .pipe-buttons-mobile .btn.active {
+    border: 3px solid var(--accent);
+    background: #d6ecff;
+  }
+
+  .pipe-buttons-mobile .btn img.pipe-img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    pointer-events: none;
+  }
+
+  /* Добавляем отступ снизу для игрового поля, чтобы не перекрывалось */
+  .board-container {
+    margin-bottom: 120px;
+  }
+}
