@@ -1,4 +1,4 @@
-document.adddEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   // DOM элементы
   const boardEl = document.getElementById('board');
   const dialogText = document.getElementById('dialogText');
@@ -667,4 +667,3 @@ document.adddEventListener('DOMContentLoaded', () => {
   initBoard();
   updateHUD();
 });
-
