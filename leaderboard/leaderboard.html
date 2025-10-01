@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Лидерборд</title>
+    <style>
+        /* Основные стили лидерборда */
+        .leaderboard-container {
+            font-family: 'Arial', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #1a1a2e;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            color: #fff;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .leaderboard-container.show {
+            display: block;
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .leaderboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #4cc9f0;
+        }
+
+        .leaderboard-title {
+            font-size: 24px;
+            margin: 0;
+            color: #4cc9f0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #4cc9f0;
+        }
+
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .leaderboard-table th {
+            background-color: #16213e;
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .leaderboard-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #2d3748;
+        }
+
+        .leaderboard-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .leaderboard-table tr:hover {
+            background-color: rgba(76, 201, 240, 0.1);
+        }
+
+        .rank {
+            font-weight: bold;
+            color: #4cc9f0;
+            width: 50px;
+        }
+
+        .player-name {
+            font-weight: bold;
+        }
+
+        .player-score {
+            text-align: right;
+            font-family: 'Courier New', monospace;
+        }
+
+        .highlight {
+            background-color: rgba(76, 201, 240, 0.2) !important;
+            font-weight: bold;
+        }
+
+        /* Оверлей для фона */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            display: none;
+        }
+
+        .overlay.show {
+            display: block;
+        }
+
+        /* Анимации */
+        @keyframes slideIn {
+            from {
+                transform: translate(-50%, -50%) scale(0.9);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
+        }
+
+        .leaderboard-container.show {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Кнопка для открытия лидерборда -->
+    <button id="show-leaderboard-btn" style="position: fixed; top: 20px; right: 20px; z-index: 100;">
+        Показать лидерборд
+    </button>
+
+    <!-- Оверлей -->
+    <div id="overlay" class="overlay"></div>
+
+    <!-- Контейнер лидерборда -->
+    <div id="leaderboard" class="leaderboard-container">
+        <div class="leaderboard-header">
+            <h1 class="leaderboard-title">ТОП ИГРОКОВ</h1>
+            <button class="close-btn" id="close-leaderboard">&times;</button>
+        </div>
+        <table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Игрок</th>
+                    <th>Очки</th>
+                </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+                <!-- Строки будут добавляться динамически -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Данные лидерборда (можно заменить на данные с сервера)
+        const leaderboardData = [
+            { name: "СуперИгрок", score: 12500, isCurrent: false },
+            { name: "Профессионал", score: 9800, isCurrent: false },
+            { name: "Вы", score: 8765, isCurrent: true },
+            { name: "Новичок", score: 6540, isCurrent: false },
+            { name: "Любитель", score: 4320, isCurrent: false },
+            { name: "Чемпион", score: 3210, isCurrent: false },
+            { name: "Эксперт", score: 2100, isCurrent: false },
+            { name: "Мастер", score: 1500, isCurrent: false },
+            { name: "Гуру", score: 1000, isCurrent: false },
+            { name: "Рекрут", score: 500, isCurrent: false }
+        ];
+
+        // Элементы DOM
+        const leaderboard = document.getElementById('leaderboard');
+        const overlay = document.getElementById('overlay');
+        const showBtn = document.getElementById('show-leaderboard-btn');
+        const closeBtn = document.getElementById('close-leaderboard');
+        const tbody = document.getElementById('leaderboard-body');
+
+        // Функция для отображения лидерборда
+        function showLeaderboard() {
+            leaderboard.classList.add('show');
+            overlay.classList.add('show');
+        }
+
+        // Функция для скрытия лидерборда
+        function hideLeaderboard() {
+            leaderboard.classList.remove('show');
+            overlay.classList.remove('show');
+        }
+
+        // Функция для обновления данных в таблице
+        function updateLeaderboard(data) {
+            tbody.innerHTML = '';
+
+            data.forEach((player, index) => {
+                const tr = document.createElement('tr');
+                if (player.isCurrent) {
+                    tr.classList.add('highlight');
+                }
+
+                tr.innerHTML = `
+                    <td class="rank">${index + 1}</td>
+                    <td class="player-name">${player.name}</td>
+                    <td class="player-score">${player.score.toLocaleString()}</td>
+                `;
+
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Инициализация лидерборда
+        updateLeaderboard(leaderboardData);
+
+        // Обработчики событий
+        showBtn.addEventListener('click', showLeaderboard);
+        closeBtn.addEventListener('click', hideLeaderboard);
+        overlay.addEventListener('click', hideLeaderboard);
+
+        // Для демонстрации - можно удалить в реальном проекте
+        console.log("Лидерборд готов к использованию. Вызовите showLeaderboard() для отображения.");
+    </script>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FinGas — Уровень 4</title>
+  <link rel="stylesheet" href="css/level4.css">
+</head>
+<body>
+<header class="hud">
+  <div class="hud-item">Игрок: <span id="playerName">Игрок</span></div>
+  <div class="hud-item">ФинГаз: <span id="finGas">100</span></div>
+  <div class="hud-item">Рублики: <span id="rubles">0</span></div>
+</header>
+
+<main class="game-area">
+  <!-- Боковая панель -->
+  <aside class="side-panel">
+    <div class="character">
+      <div class="char-img">Ф</div>
+      <div class="char-name">Финн</div>
+    </div>
+
+    <div class="dialog-box">
+      <p id="dialogText">Молодчина! Отлично справился</p>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="nextBtn" class="btn">Далее</button>
+        <button id="hintBtn" class="btn ghost" title="Подсказка (платно)">Подсказка</button>
+      </div>
+    </div>
+
+    <!-- Панель выбора трубы -->
+    <div id="pipeChoice" class="pipe-choice">
+      <p>Выберите трубу:</p>
+      <div class="pipe-buttons">
+        <button class="btn" data-type="H" onclick="choosePipe('H')">
+          <img src="images/H.png" alt="горизонтальная" class="pipe-img">
+        </button>
+        <button class="btn" data-type="V" onclick="choosePipe('V')">
+          <img src="images/V.png" alt="вертикальная" class="pipe-img">
+        </button>
+        <button class="btn" data-type="LU" onclick="choosePipe('LU')">
+          <img src="images/LU.png" alt="верх-лево" class="pipe-img">
+        </button>
+        <button class="btn" data-type="UR" onclick="choosePipe('UR')">
+          <img src="images/UR.png" alt="верх-право" class="pipe-img">
+        </button>
+        <button class="btn" data-type="LD" onclick="choosePipe('LD')">
+          <img src="images/LD.png" alt="низ-лево" class="pipe-img">
+        </button>
+        <button class="btn" data-type="RD" onclick="choosePipe('RD')">
+          <img src="images/RD.png" alt="низ-право" class="pipe-img">
+        </button>
+      </div>
+    </div>
+
+  </aside>
+
+  <!-- Игровое поле -->
+  <section class="board-container">
+    <div id="board" class="board" aria-label="Игровое поле"></div>
+
+    <!-- Анимационные элементы будут создаваться динамически -->
+  </section>
+</main>
+
+<!-- Модалка с финансовыми вопросами -->
+<div id="quizModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <h3>Желтая зона</h3>
+    <p id="quizQuestion">Вопрос по финансовой грамотности</p>
+    <div class="answers" id="quizAnswers"></div>
+    <div style="margin-top:10px"><button id="quizClose" class="btn ghost">Отмена</button></div>
+  </div>
+</div>
+
+<!-- Модалка с продуктами банка -->
+<div id="productModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <h3>Продукт банка</h3>
+    <p id="productText">Ознакомьтесь с продуктом банка</p>
+    <div class="product-info" id="productInfo"></div>
+    <div style="margin-top:10px">
+      <button id="productClose" class="btn">Понятно</button>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка с объяснением желтых зон -->
+<div id="yellowZoneIntroModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <h3>Желтая зона</h3>
+    <div class="product-info">
+      <p>Это желтая зона! Здесь тебе нужно ответить на вопросы по финансовой грамотности.</p>
+      <p>Будь внимателен - неправильный ответ заберет часть твоего ФинГаза!</p>
+      <p>Правильные ответы принесут тебе дополнительные Рублики.</p>
+    </div>
+    <div style="margin-top:10px">
+      <button id="yellowZoneIntroClose" class="btn">Понятно</button>
+    </div>
+  </div>
+</div>
+
+<!-- Модалка с объяснением газиков -->
+<div id="gazikIntroModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <h3>Газики</h3>
+    <div class="product-info">
+      <p>О, видишь эти огонечки на экране? Это Газики – твои жизни!</p>
+      <p>При потере ФинГаза ты теряешь и Газики. Периодически дополнительные Газики будут появляться на твоем экране.</p>
+      <p>Чтобы получить их, нужно ознакомиться с другими продуктами банка или выполнить задания, также связанные с услугами банка.</p>
+    </div>
+    <div style="margin-top:10px">
+      <button id="gazikIntroClose" class="btn">Понятно</button>
+    </div>
+  </div>
+</div>
+
+<!-- Итог уровня -->
+<div id="resultModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <h3>Уровень 4 завершён</h3>
+    <p id="resultNote"></p>
+    <div id="bonusInfo"></div>
+    <div style="margin-top:12px">
+      <button id="closeResult" class="btn">ОК</button>
+    </div>
+  </div>
+</div>
+
+<!-- Ежедневные награды -->
+<div id="dailyModal" class="modal" aria-hidden="true">
+  <div class="modal-content daily-rewards">
+    <h3>Ежедневные награды</h3>
+    <div class="rewards-grid">
+      <div class="reward-day"><span>День 1</span><br>+10 ⚡</div>
+      <div class="reward-day"><span>День 2</span><br>+20 ₽</div>
+      <div class="reward-day"><span>День 3</span><br>+15 ⚡</div>
+      <div class="reward-day"><span>День 4</span><br>+30 ₽</div>
+      <div class="reward-day"><span>День 5</span><br>+25 ⚡</div>
+      <div class="reward-day"><span>День 6</span><br>+50 ₽</div>
+      <div class="reward-day"><span>День 7</span><br>+100 ⚡ +100 ₽</div>
+    </div>
+    <div style="margin-top:12px; display: flex; gap: 10px; justify-content: center;">
+      <button id="closeDaily" class="btn ghost">На главную</button>
+      <button id="nextLevel" class="btn">Следующий уровень</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/level4.js"></script>
+</body>
+</html>
