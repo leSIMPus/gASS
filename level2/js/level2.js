@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.adddEventListener('DOMContentLoaded', () => {
   // DOM элементы
   const boardEl = document.getElementById('board');
   const dialogText = document.getElementById('dialogText');
@@ -184,63 +184,24 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       grid.push(row);
     }
-  
+
     // Старт и финиш
     const start = getCell(7, 0);
     start.classList.add('start');
     renderPipe(start, 'H', { fixed: true });
-  
+
     const goal = getCell(0, 4);
     goal.classList.add('goal');
     renderPipe(goal, 'V', { fixed: true });
-  
+
     // Желтые зоны
     placeYellowZones();
-  
+
     // Газики
     spawnGazik();
-  
-    // Создаем мобильную панель выбора труб
-    createMobilePipePanel();
-  
+
     // Обновление интерфейса
     updateHUD();
-  }
-  
-  // Новая функция для создания мобильной панели выбора труб
-  function createMobilePipePanel() {
-    // Если панель уже существует, удаляем ее
-    const existingPanel = document.querySelector('.mobile-pipe-panel');
-    if (existingPanel) {
-      existingPanel.remove();
-    }
-    
-    // Создаем новую панель только для мобильных устройств
-    if (window.innerWidth <= 768) {
-      const mobilePanel = document.createElement('div');
-      mobilePanel.className = 'mobile-pipe-panel';
-      
-      // Копируем содержимое из оригинальной панели
-      const originalPipeChoice = document.getElementById('pipeChoice');
-      mobilePanel.innerHTML = originalPipeChoice.innerHTML;
-      
-      // Добавляем на страницу
-      document.body.appendChild(mobilePanel);
-      
-      // Обновляем обработчики клика для мобильной панели
-      const mobileButtons = mobilePanel.querySelectorAll('.btn[data-type]');
-      mobileButtons.forEach(btn => {
-        btn.onclick = function() {
-          choosePipe(this.dataset.type);
-        };
-      });
-    }
-  }
-  
-  // Обработчик изменения размера окна
-  window.addEventListener('resize', function() {
-    createMobilePipePanel();
-  });
   }
 
   // Размещение желтых зон
@@ -707,14 +668,3 @@ document.addEventListener('DOMContentLoaded', () => {
   updateHUD();
 });
 
-// Обработчик изменения размера окна
-window.addEventListener('resize', function() {
-  if (window.innerWidth <= 768) {
-    createMobilePipePanel();
-  } else {
-    const mobilePanel = document.querySelector('.mobile-pipe-panel');
-    if (mobilePanel) {
-      mobilePanel.remove();
-    }
-  }
-});
