@@ -521,3 +521,58 @@ body {
     opacity: 0;
   }
 }
+
+/* Мобильная версия - горизонтальная панель труб внизу */
+@media (max-width: 768px) {
+  .game-area {
+    padding-bottom: 80px;
+  }
+  
+  .side-panel {
+    order: 1;
+  }
+  
+  #pipeChoice {
+    order: 2;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    padding: 12px;
+    border-top: 2px solid #e0e0e0;
+    z-index: 100;
+    margin-top: 0;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .pipe-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+  
+  .pipe-buttons .btn {
+    flex: 0 0 auto;
+    width: 44px;
+    height: 44px;
+    min-width: auto;
+    padding: 4px;
+  }
+  
+  .pipe-buttons .pipe-img {
+    width: 24px;
+    height: 24px;
+  }
+  
+  #pipeChoice p {
+    display: none;
+  }
+  
+  .board-container {
+    margin-bottom: 20px;
+  }
+}
