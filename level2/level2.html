@@ -14,8 +14,8 @@
 </header>
 
 <main class="game-area">
-  <!-- Верхняя часть - диалоги Финна + выбор труб для десктопа -->
-  <aside class="side-panel-top">
+  <!-- Боковая панель с диалогами Финна -->
+  <aside class="side-panel">
     <div class="character">
       <div class="char-img">Ф</div>
       <div class="char-name">Финн</div>
@@ -29,8 +29,8 @@
       </div>
     </div>
 
-    <!-- Выбор труб для десктопной версии -->
-    <div class="pipe-choice desktop-pipes">
+    <!-- Панель выбора трубы для десктопа -->
+    <div id="pipeChoice" class="pipe-choice">
       <p>Выберите трубу:</p>
       <div class="pipe-buttons">
         <button class="btn" data-type="H" onclick="choosePipe('H')">
@@ -55,39 +55,68 @@
     </div>
   </aside>
 
-  <!-- Игровое поле -->
-  <section class="board-container">
-    <div id="board" class="board" aria-label="Игровое поле"></div>
-  </section>
+  <!-- Основная область с игровым полем и мобильной панелью -->
+  <div class="main-content-area">
+    <!-- Игровое поле -->
+    <section class="board-container">
+      <div id="board" class="board" aria-label="Игровое поле"></div>
+    </section>
 
-  <!-- Нижняя часть - только выбор труб для мобильных -->
-  <aside class="side-panel-bottom">
-    <div class="pipe-choice mobile-pipes">
-      <p>Выберите трубу:</p>
-      <div class="pipe-buttons-mobile">
-        <button class="btn" data-type="H" onclick="choosePipe('H')">
-          <img src="images/H.png" alt="горизонтальная" class="pipe-img">
-        </button>
-        <button class="btn" data-type="V" onclick="choosePipe('V')">
-          <img src="images/V.png" alt="вертикальная" class="pipe-img">
-        </button>
-        <button class="btn" data-type="LU" onclick="choosePipe('LU')">
-          <img src="images/LU.png" alt="верх-лево" class="pipe-img">
-        </button>
-        <button class="btn" data-type="UR" onclick="choosePipe('UR')">
-          <img src="images/UR.png" alt="верх-право" class="pipe-img">
-        </button>
-        <button class="btn" data-type="LD" onclick="choosePipe('LD')">
-          <img src="images/LD.png" alt="низ-лево" class="pipe-img">
-        </button>
-        <button class="btn" data-type="RD" onclick="choosePipe('RD')">
-          <img src="images/RD.png" alt="низ-право" class="pipe-img">
-        </button>
+    <!-- Мобильная панель выбора труб -->
+    <div id="mobilePipePanel" class="mobile-pipe-panel">
+      <div class="pipe-choice-mobile">
+        <p>Выберите трубу:</p>
+        <div class="pipe-buttons-mobile">
+          <button class="btn" data-type="H" onclick="choosePipe('H')">
+            <img src="images/H.png" alt="горизонтальная" class="pipe-img">
+          </button>
+          <button class="btn" data-type="V" onclick="choosePipe('V')">
+            <img src="images/V.png" alt="вертикальная" class="pipe-img">
+          </button>
+          <button class="btn" data-type="LU" onclick="choosePipe('LU')">
+            <img src="images/LU.png" alt="верх-лево" class="pipe-img">
+          </button>
+          <button class="btn" data-type="UR" onclick="choosePipe('UR')">
+            <img src="images/UR.png" alt="верх-право" class="pipe-img">
+          </button>
+          <button class="btn" data-type="LD" onclick="choosePipe('LD')">
+            <img src="images/LD.png" alt="низ-лево" class="pipe-img">
+          </button>
+          <button class="btn" data-type="RD" onclick="choosePipe('RD')">
+            <img src="images/RD.png" alt="низ-право" class="pipe-img">
+          </button>
+        </div>
       </div>
     </div>
-  </aside>
+  </div>
 </main>
 
+<!-- Мобильная панель выбора труб (ВНЕ основного контента) -->
+<div id="mobilePipePanel" class="mobile-pipe-panel">
+  <div class="pipe-choice-mobile">
+    <p>Выберите трубу:</p>
+    <div class="pipe-buttons-mobile">
+      <button class="btn" data-type="H" onclick="choosePipe('H')">
+        <img src="images/H.png" alt="горизонтальная" class="pipe-img">
+      </button>
+      <button class="btn" data-type="V" onclick="choosePipe('V')">
+        <img src="images/V.png" alt="вертикальная" class="pipe-img">
+      </button>
+      <button class="btn" data-type="LU" onclick="choosePipe('LU')">
+        <img src="images/LU.png" alt="верх-лево" class="pipe-img">
+      </button>
+      <button class="btn" data-type="UR" onclick="choosePipe('UR')">
+        <img src="images/UR.png" alt="верх-право" class="pipe-img">
+      </button>
+      <button class="btn" data-type="LD" onclick="choosePipe('LD')">
+        <img src="images/LD.png" alt="низ-лево" class="pipe-img">
+      </button>
+      <button class="btn" data-type="RD" onclick="choosePipe('RD')">
+        <img src="images/RD.png" alt="низ-право" class="pipe-img">
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- Модалка с финансовыми вопросами -->
 <div id="quizModal" class="modal" aria-hidden="true">
@@ -174,34 +203,5 @@
 </div>
 
 <script src="js/level2.js"></script>
-
-<div id="mobilePipePanel" class="mobile-pipe-panel">
-  <div class="pipe-choice-mobile">
-    <p>Выберите трубу:</p>
-    <div class="pipe-buttons-mobile">
-      <button class="btn" data-type="H" onclick="choosePipe('H')">
-        <img src="images/H.png" alt="горизонтальная" class="pipe-img">
-      </button>
-      <button class="btn" data-type="V" onclick="choosePipe('V')">
-        <img src="images/V.png" alt="вертикальная" class="pipe-img">
-      </button>
-      <button class="btn" data-type="LU" onclick="choosePipe('LU')">
-        <img src="images/LU.png" alt="верх-лево" class="pipe-img">
-      </button>
-      <button class="btn" data-type="UR" onclick="choosePipe('UR')">
-        <img src="images/UR.png" alt="верх-право" class="pipe-img">
-      </button>
-      <button class="btn" data-type="LD" onclick="choosePipe('LD')">
-        <img src="images/LD.png" alt="низ-лево" class="pipe-img">
-      </button>
-      <button class="btn" data-type="RD" onclick="choosePipe('RD')">
-        <img src="images/RD.png" alt="низ-право" class="pipe-img">
-      </button>
-    </div>
-  </div>
-</div>
-
-<script src="js/level2.js"></script>
 </body>
 </html>
-
