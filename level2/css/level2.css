@@ -74,20 +74,84 @@ body {
   box-shadow: 0 6px 20px rgba(0,0,0,0.05);
 }
 
+/* Мобильная версия - горизонтальная панель труб внизу экрана */
 @media (max-width: 768px) {
-  #board {
-    width: calc(100vw - 40px);
-    height: calc(100vw - 40px);
-  }
-
   .game-area {
     flex-direction: column;
-    align-items: center;
+    padding-bottom: 80px; /* Место для фиксированной панели */
+    position: relative;
   }
-
+  
   .side-panel {
     width: 100%;
-    max-width: 380px;
+    max-width: 100%;
+    order: 1;
+  }
+  
+  .board-container {
+    order: 2;
+    width: 100%;
+    margin-bottom: 0;
+  }
+  
+  /* Скрываем оригинальную панель выбора в side-panel */
+  .side-panel #pipeChoice {
+    display: none;
+  }
+  
+  /* Создаем дубликат панели для мобильных */
+  .game-area::after {
+    content: '';
+    display: block;
+    height: 80px; /* Высота панели труб */
+  }
+}
+
+/* Фиксированная панель труб для мобильных */
+.mobile-pipe-panel {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .mobile-pipe-panel {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    padding: 12px 8px;
+    border-top: 2px solid #e0e0e0;
+    z-index: 1000;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+  }
+  
+  .mobile-pipe-panel .pipe-buttons {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 8px;
+    overflow-x: auto;
+    padding: 4px 0;
+  }
+  
+  .mobile-pipe-panel .pipe-buttons .btn {
+    flex: 0 0 auto;
+    width: 50px;
+    height: 50px;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .mobile-pipe-panel .pipe-img {
+    width: 30px;
+    height: 30px;
+  }
+  
+  .mobile-pipe-panel p {
+    display: none;
   }
 }
 
