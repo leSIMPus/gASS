@@ -2,8 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>FinGas — Уровень 3</title>
     <link rel="stylesheet" href="css/level3.css">
 </head>
@@ -23,7 +22,7 @@
         </div>
 
         <div class="dialog-box">
-            <p id="dialogText">Ты отлично справилась с предыдущим уровнем!</p>
+            <p id="dialogText">Замечательная работа на втором уровне!</p>
             <div style="display:flex;gap:8px;margin-top:8px">
                 <button id="nextBtn" class="btn">Далее</button>
                 <button id="hintBtn" class="btn ghost" title="Подсказка (платно)">Подсказка</button>
@@ -54,15 +53,18 @@
                 </button>
             </div>
         </div>
+
     </aside>
 
     <!-- Игровое поле -->
     <section class="board-container">
         <div id="board" class="board" aria-label="Игровое поле"></div>
+
+        <!-- Анимационные элементы будут создаваться динамически -->
     </section>
 </main>
 
-<!-- Модалка с белыми зонами (бонусный квиз) -->
+<!-- Модалка с финансовыми вопросами -->
 <div id="quizModal" class="modal" aria-hidden="true">
     <div class="modal-content">
         <h3>Белая зона</h3>
@@ -84,10 +86,24 @@
     </div>
 </div>
 
+<!-- Модалка с объяснением белых зон -->
+<div id="whiteZoneIntroModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+        <h3>Белая зона</h3>
+        <div class="product-info">
+            <p>Это белая зона бонусов: чтобы получить дополнительные Рублики, тебе нужно выполнить задания.</p>
+            <p>Эта зона никак не влияет на поток ФинГаза, так что если ответишь неправильно - потеряешь только шанс заработать бонусные Рублики. </p>
+        </div>
+        <div style="margin-top:10px">
+            <button id="whiteZoneIntroClose" class="btn">Понятно</button>
+        </div>
+    </div>
+</div>
+
 <!-- Итог уровня -->
 <div id="resultModal" class="modal" aria-hidden="true">
     <div class="modal-content">
-        <h3>Уровень 3 завершён</h3>
+        <h3>Уровень 2 завершён</h3>
         <p id="resultNote"></p>
         <div id="bonusInfo"></div>
         <div style="margin-top:12px">
@@ -109,8 +125,9 @@
             <div class="reward-day"><span>День 6</span><br>+50 ₽</div>
             <div class="reward-day"><span>День 7</span><br>+100 ⚡ +100 ₽</div>
         </div>
-        <div style="margin-top:12px">
-            <button id="closeDaily" class="btn">Отлично!</button>
+        <div style="margin-top:12px; display: flex; gap: 10px; justify-content: center;">
+            <button id="closeDaily" class="btn ghost">На главную</button>
+            <button id="nextLevel" class="btn">Следующий уровень</button>
         </div>
     </div>
 </div>

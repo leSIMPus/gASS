@@ -1,4 +1,3 @@
-el3.js — логика уровня 3 с белыми зонами
 document.addEventListener('DOMContentLoaded', () => {
   // DOM элементы
   const boardEl = document.getElementById('board');
@@ -18,7 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeResult = document.getElementById('closeResult');
   const dailyModal = document.getElementById('dailyModal');
   const closeDaily = document.getElementById('closeDaily');
+  const nextLevelBtn = document.getElementById('nextLevel'); // Новая кнопка
   const playerNameEl = document.getElementById('playerName');
+
+  // Новые элементы для обучающих модалок
+  const whiteZoneIntroModal = document.getElementById('whiteZoneIntroModal');
+  const whiteZoneIntroClose = document.getElementById('whiteZoneIntroClose');
 
   // состояние игры
   const rows = 8, cols = 5;
@@ -35,7 +39,9 @@ document.addEventListener('DOMContentLoaded', () => {
   let hasSeenGazikiIntro = false;
 
   // направления и типы труб
-  const DIRS = { t: [-1, 0], r: [0, 1], b: [1, 0], l: [0, -1] };
+  const DIRS = {
+    t: [-1, 0], r: [0, 1], b: [1, 0], l: [0, -1]
+  };
   const OPP = { t: 'b', b: 't', l: 'r', r: 'l' };
   const DIR_KEYS = Object.keys(DIRS);
 
@@ -48,33 +54,50 @@ document.addEventListener('DOMContentLoaded', () => {
     UR: { sym: "└", dirs: ["r", "t"] }
   };
 
-  // Вопросы для белых зон (те же, что и для жёлтых, бонусные)
+  // Вопросы для белых зон
   const FINANCE_QUESTIONS = [
-    { q: "Что лучше: тратить все деньги сразу или откладывать часть?", answers: [
-      { text: "Откладывать 10-20% от дохода", correct: true },
-      { text: "Тратить все, жизнь одна", correct: false },
-      { text: "Брать кредиты на все покупки", correct: false }
-    ] },
-    { q: "Какой минимальный размер 'финансовой подушки'?", answers: [
-      { text: "3-6 месячных доходов", correct: true },
-      { text: "1 месячный доход", correct: false },
-      { text: "Достаточно 10 000 рублей", correct: false }
-    ] },
-    { q: "Что выгоднее: дебетовая карта с кешбэком или кредитная?", answers: [
-      { text: "Дебетовая с кешбэком для повседневных трат", correct: true },
-      { text: "Кредитная для всех покупок", correct: false },
-      { text: "Не важно, главное красивая карта", correct: false }
-    ] }
-    // остальные вопросы по желанию
+    {
+      q: "Что лучше всего делать с кредитной картой, чтобы не переплачивать?",
+      answers: [
+        { text: "Снимать с неё наличные при каждой возможности", correct: false },
+        { text: "Оплачивать покупки полностью каждый месяц", correct: true },
+        { text: "Использовать только половину лимита карты", correct: false }
+      ]
+    },
+    {
+      q: "Что из этого является инвестициями?",
+      answers: [
+        { text: "Покупка акций компании", correct: true },
+        { text: "Покупка нового смартфона", correct: false },
+        { text: "Оплата ежемесячного мобильного тарифа", correct: false }
+      ]
+    },
+    {
+      q: "Что выгоднее: дебетовая карта с кешбэком или кредитная?",
+      answers: [
+        { text: "Дебетовая с кешбэком для повседневных трат", correct: true },
+        { text: "Кредитная для всех покупок", correct: false },
+        { text: "Не важно, главное красивая карта", correct: false }
+      ]
+    },
+    {
+      q: "Почему важно иметь финансовую подушку безопасности?",
+      answers: [
+        { text: "Чтобы тратить больше денег на развлечения", correct: false },
+        { text: "Чтобы иметь средства на непредвиденные расходы", correct: true },
+        { text: "Чтобы брать кредиты чаще", correct: false }
+      ]
+    },
+    {
+      q: "Что такое процент по кредиту?",
+      answers: [
+        { text: "Дополнительная сумма, которую банк начисляет на ваш долг", correct: true },
+        { text: "Скидка за быстрое погашение кредита", correct: false },
+        { text: "Ежемесячная комиссия за использование карты", correct: false }
+      ]
+    }
   ];
 
-  // Продукты банка для газиков
-  const BANK_PRODUCTS = [
-    { name: "Накопительный счет", description: "До 8% годовых на остаток, пополнение и снятие в любой момент" },
-    { name: "Инвестиции", description: "Покупка акций и облигаций с доходностью выше вклада" },
-    { name: "Страхование", description: "Защита здоровья, имущества и финансовых рисков" },
-    { name: "Ипотека", description: "Выгодные ставки от 5% на покупку жилья" }
-  ];
 
   // Вспомогательные функции
   function getPipeDirsFromType(type) {
@@ -82,25 +105,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const def = TYPE_DEFS[type];
     return def ? def.dirs : [];
   }
+
   function getPipeDirsFromCell(cell) {
     if (!cell) return [];
     return getPipeDirsFromType(cell.dataset.pipe);
   }
+
   function renderPipe(cell, type, opts = {}) {
-    if (!TYPE_DEFS[type]) return;
-    cell.dataset.pipe = type;
-    cell.classList.add('has-pipe');
-    cell.innerHTML = '';
-    const img = document.createElement('img');
-    img.src = `images/${type}.png`;
-    img.alt = type;
-    img.className = 'pipe-img';
-    cell.appendChild(img);
-    if (opts.fixed) {
-      cell.classList.add('pipe-fixed');
-      cell.dataset.pipeFixed = 'true';
-    }
+      if (!TYPE_DEFS[type]) return;
+      cell.dataset.pipe = type;
+      cell.classList.add('has-pipe');
+      cell.innerHTML = '';
+
+      const img = document.createElement('img');
+      img.src = `images/${type}.png`;
+      img.alt = type;
+      img.className = 'pipe-img';
+      cell.appendChild(img);
+
+      if (opts.fixed) {
+          cell.classList.add('pipe-fixed');
+          cell.dataset.pipeFixed = 'true';
+      }
   }
+
 
   function getCell(r, c) {
     if (r < 0 || r >= rows || c < 0 || c >= cols) return null;
@@ -137,11 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
     goal.classList.add('goal');
     renderPipe(goal, 'V', { fixed: true });
 
-    // Белые зоны вместо желтых
+    // Белые зоны
     placeWhiteZones();
-
-    // Газики
-    spawnGazik();
 
     // Обновление интерфейса
     updateHUD();
@@ -150,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Размещение белых зон
   function placeWhiteZones() {
     const whitePositions = [
-      [6, 2], [5, 1], [4, 3], [3, 2], [2, 0], [1, 3]
+      [0, 0], [2, 2], [6, 2], [7, 4]
     ];
 
     whitePositions.forEach(([r, c]) => {
@@ -161,31 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
-  // Создание газиков
-  function spawnGazik() {
-    document.querySelectorAll('.cell.gazik').forEach(cell => {
-      cell.classList.remove('gazik');
-      cell.textContent = '';
-    });
 
-    const gazikCount = Math.floor(Math.random() * 2) + 2;
-    let placed = 0;
-
-    while (placed < gazikCount) {
-      const r = Math.floor(Math.random() * rows);
-      const c = Math.floor(Math.random() * cols);
-      const cell = getCell(r, c);
-
-      if (cell && !cell.dataset.pipe &&
-          !cell.classList.contains('start') &&
-          !cell.classList.contains('goal') &&
-          !cell.classList.contains('white-zone')) {
-        cell.classList.add('gazik');
-        cell.textContent = '🔥';
-        placed++;
-      }
-    }
-  }
 
   // Выбор трубы
   window.choosePipe = function(type) {
@@ -261,89 +262,33 @@ document.addEventListener('DOMContentLoaded', () => {
     // Проверка специальных клеток
     if (cell.classList.contains('white-zone')) {
       if (!hasSeenWhiteZoneIntro) {
+        // Первый раз на белой зоне - показываем объяснение
         showWhiteZoneIntro(cell);
       } else {
-        collectWhiteBonus(cell);
-      }
-    } else if (cell.classList.contains('gazik')) {
-      if (!hasSeenGazikiIntro) {
-        showGazikiIntro(cell);
-      } else {
-        collectGazik(cell);
+        openFinanceQuiz(cell);
       }
     } else {
+      // Обычная клетка - сразу проверяем поток
       checkFlow();
     }
   }
 
-  // Введение про белую зону (при первом входе)
+
+  // Введение в белую зону
   function showWhiteZoneIntro(cell) {
     hasSeenWhiteZoneIntro = true;
+    whiteZoneIntroModal.setAttribute('aria-hidden', 'false');
 
-    const currentDialog = dialogText.textContent;
-
-    dialogText.textContent = "Это белая зона! Здесь ты можешь получить бонусы без потери ФинГаза.";
-    nextBtn.disabled = false;
-    nextBtn.style.display = 'inline-block';
-    nextBtn.textContent = "Понятно";
-
-    const originalClick = nextBtn.onclick;
-
-    nextBtn.onclick = () => {
-      dialogText.textContent = currentDialog;
-      nextBtn.disabled = true;
-      nextBtn.style.display = 'none';
-      nextBtn.textContent = "Далее";
-      nextBtn.onclick = originalClick;
-
-      collectWhiteBonus(cell);
+    whiteZoneIntroClose.onclick = () => {
+      whiteZoneIntroModal.setAttribute('aria-hidden', 'true');
+      openFinanceQuiz(cell);
     };
   }
 
-  // Получение бонуса на белой зоне
-  function collectWhiteBonus(cell) {
-    // В белых зонах просто даем бонус без вопросов
-    rubles += 15;
-    gaziksCollected++;
-    createFloatingText(cell, '+15 ₽', 'gold');
-    createFloatingText(cell, '+1 🔥', '#2a7ade', 'gazik-floating');
 
-    updateHUD();
-    cell.classList.remove('white-zone');
-    checkFlow();
-  }
-
-  // Вопросы для белых зон — бонусные
-  const WHITE_ZONE_QUESTIONS = [
-    {
-      q: "Какой предмет чаще всего помогает зарабатывать рубли?",
-      answers: [
-        { text: "Правильное планирование", correct: true },
-        { text: "Сон", correct: false },
-        { text: "Прогулки", correct: false }
-      ]
-    },
-    {
-      q: "Что увеличивает количество Газиков?",
-      answers: [
-        { text: "Сбор бонусов и выполнение заданий", correct: true },
-        { text: "Игнорирование бонусов", correct: false },
-        { text: "Случайные клики", correct: false }
-      ]
-    },
-    {
-      q: "Что важно для игрового прогресса?",
-      answers: [
-        { text: "Использовать трубы стратегически", correct: true },
-        { text: "Кликать куда попало", correct: false },
-        { text: "Сидеть на месте", correct: false }
-      ]
-    }
-  ];
-
-  // Открытие бонусного квиза белой зоны
-  function openWhiteZoneQuiz(cell) {
-    const availableQuestions = WHITE_ZONE_QUESTIONS.filter(q => !usedQuestions.has(q.q));
+  // Финансовый квиз
+  function openFinanceQuiz(cell) {
+    const availableQuestions = FINANCE_QUESTIONS.filter(q => !usedQuestions.has(q.q));
 
     if (availableQuestions.length === 0) {
       usedQuestions.clear();
@@ -359,313 +304,271 @@ document.addEventListener('DOMContentLoaded', () => {
       const btn = document.createElement('button');
       btn.textContent = opt.text;
       btn.className = 'btn';
+
       btn.addEventListener('click', () => {
         quizModal.setAttribute('aria-hidden', 'true');
+
         if (opt.correct) {
-          rubles += 20; // бонус за правильный ответ
-          gaziksCollected += 1;
-          createFloatingText(cell, '+20 ₽', 'gold');
-          createFloatingText(cell, '+1 🔥', '#ff4500', 'gazik-floating');
+          correctAnswers++;
+          rubles += 15;
+          createFloatingText(cell, '+15 ₽', 'gold');
         } else {
-          // бонус все равно даем, но меньше
-          rubles += 10;
-          createFloatingText(cell, '+10 ₽', 'gold');
+        createFloatingText(cell, 'Увы :(', '#ff6600');
         }
+
         updateHUD();
         cell.classList.remove('white-zone');
         checkFlow();
       });
+
       quizAnswers.appendChild(btn);
     });
+
 
     quizModal.setAttribute('aria-hidden', 'false');
   }
 
-  // Изменяем collectWhiteBonus, чтобы запускал квиз
-  function collectWhiteBonus(cell) {
-    openWhiteZoneQuiz(cell);
-  }
-// Сбор газика — уровень 3
-function collectGazik(cell) {
-  const product = BANK_PRODUCTS[Math.floor(Math.random() * BANK_PRODUCTS.length)];
-  productInfo.innerHTML = `
-    <h4>${product.name}</h4>
-    <p>${product.description}</p>
-  `;
+  // Создание всплывающего текста
+  function createFloatingText(cell, text, color, className = '') {
+    if (!cell) return;
 
-  productModal.setAttribute('aria-hidden', 'false');
+    const floatingText = document.createElement('div');
+    floatingText.textContent = text;
+    floatingText.style.cssText = `
+      position: absolute;
+      pointer-events: none;
+      font-weight: 800;
+      color: ${color};
+      font-size: 20px;
+      z-index: 100;
+      transition: transform 0.9s ease, opacity 0.9s ease;
+      opacity: 1;
+    `;
 
-  productClose.onclick = () => {
-    productModal.setAttribute('aria-hidden', 'true');
-    finGas += 5;
-    gaziksCollected++;
-    createFloatingText(cell, '+5 🔥', '#2a7ade', 'gazik-floating');
-    cell.classList.remove('gazik');
-    spawnGazik();
-    updateHUD();
-    checkFlow();
-  };
-}
+    // ДОБАВЛЯЕМ эту проверку для класса:
+    if (className) {
+      floatingText.className = className;
+    }
 
+    const rect = cell.getBoundingClientRect();
+    const boardRect = boardEl.getBoundingClientRect();
 
-// Создание всплывающего текста — без изменений
-function createFloatingText(cell, text, color, className = '') {
-  if (!cell) return;
+    floatingText.style.left = (rect.left - boardRect.left + rect.width / 2) + 'px';
+    floatingText.style.top = (rect.top - boardRect.top - 10) + 'px';
 
-  const floatingText = document.createElement('div');
-  floatingText.textContent = text;
-  floatingText.style.cssText = `
-    position: absolute;
-    pointer-events: none;
-    font-weight: 800;
-    color: ${color};
-    font-size: 20px;
-    z-index: 100;
-    transition: transform 0.9s ease, opacity 0.9s ease;
-    opacity: 1;
-  `;
+    boardEl.parentElement.appendChild(floatingText);
 
-  if (className) {
-    floatingText.className = className;
-  }
-
-  const rect = cell.getBoundingClientRect();
-  const boardRect = boardEl.getBoundingClientRect();
-
-  floatingText.style.left = (rect.left - boardRect.left + rect.width / 2) + 'px';
-  floatingText.style.top = (rect.top - boardRect.top - 10) + 'px';
-
-  boardEl.parentElement.appendChild(floatingText);
-
-  setTimeout(() => {
-    floatingText.style.opacity = '0';
-    floatingText.style.transform = 'translateY(-70px)';
     setTimeout(() => {
-      if (floatingText.parentElement) {
-        floatingText.parentElement.removeChild(floatingText);
-      }
-    }, 900);
-  }, 100);
-}
-
-
-
-// Проверка потока — без изменений, только увеличиваем скорость анимации
-function animateFlow(pathKeys) {
-  if (flowInProgress) return;
-  flowInProgress = true;
-  document.querySelectorAll('.cell.flow').forEach(el => el.classList.remove('flow'));
-  let i = 0;
-  const interval = setInterval(() => {
-    if (i >= pathKeys.length) {
-      clearInterval(interval);
-      flowInProgress = false;
-      completeLevel();
-      return;
-    }
-    const [r, c] = pathKeys[i].split(',').map(Number);
-    const cell = getCell(r, c);
-    if (cell) cell.classList.add('flow');
-    i++;
-  }, 180); // быстрее поток для уровня 3
-}
-
-function checkFlow() {
-  const start = { r: 7, c: 0 };
-  const goal = { r: 0, c: 4 };
-  const startKey = `${start.r},${start.c}`;
-  const goalKey = `${goal.r},${goal.c}`;
-
-  const visited = new Set();
-  const prev = new Map();
-  const queue = [startKey];
-
-  function pushIfValid(nr, nc, fromKey) {
-    const k = `${nr},${nc}`;
-    if (visited.has(k)) return;
-    const neigh = getCell(nr, nc);
-    if (!neigh) return;
-    queue.push(k);
-    prev.set(k, fromKey);
+      floatingText.style.opacity = '0';
+      floatingText.style.transform = 'translateY(-70px)';
+      setTimeout(() => {
+        if (floatingText.parentElement) {
+          floatingText.parentElement.removeChild(floatingText);
+        }
+      }, 900);
+    }, 100);
   }
 
-  function canConnect(r, c, dirKey) {
-    const cell = getCell(r, c);
-    if (!cell) return false;
-    const type = cell.dataset.pipe;
-    if (!type) return false;
-    const dirs = TYPE_DEFS[type].dirs;
-    return dirs.includes(dirKey);
-  }
+  // Проверка потока
+  function checkFlow() {
+    const start = { r: 7, c: 0 };
+    const goal = { r: 0, c: 4 };
+    const startKey = `${start.r},${start.c}`;
+    const goalKey = `${goal.r},${goal.c}`;
 
-  while (queue.length) {
-    const key = queue.shift();
-    if (visited.has(key)) continue;
-    visited.add(key);
-    const [r, c] = key.split(',').map(Number);
+    const visited = new Set();
+    const prev = new Map();
+    const queue = [startKey];
 
-    if (r === goal.r && c === goal.c) {
-      const path = reconstructPath(prev, key, startKey);
-      animateFlow(path);
-      return true;
-    }
-
-    const curCell = getCell(r, c);
-    const curType = curCell ? curCell.dataset.pipe : null;
-    if (!curType || !TYPE_DEFS[curType]) continue;
-
-    for (const dirKey of TYPE_DEFS[curType].dirs) {
-      const [dr, dc] = DIRS[dirKey];
-      const nr = r + dr, nc = c + dc;
-      if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
+    function pushIfValid(nr, nc, fromKey) {
+      const k = `${nr},${nc}`;
+      if (visited.has(k)) return;
       const neigh = getCell(nr, nc);
-      if (!neigh) continue;
+      if (!neigh) return;
+      queue.push(k);
+      prev.set(k, fromKey);
+    }
 
-      if (neigh.classList.contains('goal')) {
-        prev.set(goalKey, key);
-        const path = reconstructPath(prev, goalKey, startKey);
+    function canConnect(r, c, dirKey) {
+      const cell = getCell(r, c);
+      if (!cell) return false;
+      const type = cell.dataset.pipe;
+      if (!type) return false;
+      const dirs = TYPE_DEFS[type].dirs;
+      return dirs.includes(dirKey);
+    }
+
+    while (queue.length) {
+      const key = queue.shift();
+      if (visited.has(key)) continue;
+      visited.add(key);
+      const [r, c] = key.split(',').map(Number);
+
+      if (r === goal.r && c === goal.c) {
+        const path = reconstructPath(prev, key, startKey);
         animateFlow(path);
         return true;
       }
 
-      const neighType = neigh.dataset.pipe;
-      if (!neighType) continue;
-      const oppKey = OPP[dirKey];
-      if (TYPE_DEFS[neighType].dirs.includes(oppKey)) {
-        const nkey = `${nr},${nc}`;
-        if (!visited.has(nkey) && !queue.includes(nkey)) {
-          prev.set(nkey, key);
-          queue.push(nkey);
+      const curCell = getCell(r, c);
+      const curType = curCell ? curCell.dataset.pipe : null;
+      if (!curType || !TYPE_DEFS[curType]) continue;
+
+      for (const dirKey of TYPE_DEFS[curType].dirs) {
+        const [dr, dc] = DIRS[dirKey];
+        const nr = r + dr, nc = c + dc;
+        if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
+        const neigh = getCell(nr, nc);
+        if (!neigh) continue;
+
+        if (neigh.classList.contains('goal')) {
+          prev.set(goalKey, key);
+          const path = reconstructPath(prev, goalKey, startKey);
+          animateFlow(path);
+          return true;
+        }
+
+        const neighType = neigh.dataset.pipe;
+        if (!neighType) continue;
+        const oppKey = OPP[dirKey];
+        if (TYPE_DEFS[neighType].dirs.includes(oppKey)) {
+          const nkey = `${nr},${nc}`;
+          if (!visited.has(nkey) && !queue.includes(nkey)) {
+            prev.set(nkey, key);
+            queue.push(nkey);
+          }
         }
       }
     }
+    return false;
   }
-  return false;
-}
 
-// Завершение уровня — увеличенные бонусы
-function completeLevel() {
-  const baseReward = 30;
-  const pipeBonus = Math.max(0, 40 - pipesUsed * 2);
-  const answerBonus = correctAnswers * 15;
-  const gazikBonus = gaziksCollected * 10;
-
-  const totalReward = baseReward + pipeBonus + answerBonus + gazikBonus;
-  rubles += totalReward;
-  localStorage.setItem('fg_rub', rubles);
-  localStorage.setItem('fg_gas', finGas);
-
-  resultNote.textContent = `Отлично! Ты успешно прошёл уровень 3 и получил много Рубликов!`;
-  bonusInfo.innerHTML = `
-    <div class="bonus-item">Всего получено: +${totalReward} ₽</div>
-    <div class="bonus-item">Базовая награда: +${baseReward} ₽</div>
-    <div class="bonus-item">Бонус за трубы: +${pipeBonus} ₽</div>
-    <div class="bonus-item">Бонус за ответы: +${answerBonus} ₽</div>
-    <div class="bonus-item">Бонус за газики: +${gazikBonus} ₽</div>
-  `;
-
-  resultModal.setAttribute('aria-hidden', 'false');
-}
-
-// Обновление HUD — без изменений
-function updateHUD() {
-  rublesEl.textContent = rubles;
-  finGasEl.textContent = finGas;
-  playerNameEl.textContent = localStorage.getItem('fg_name') || 'Игрок';
-}
-
-// Диалоги уровня 3
-const DIALOGS = [
-  'Ты отлично справилась с предыдущим уровнем!',
-  'Теперь впереди уровень 3: новые задачи, новые возможности.',
-  '*появляется белая зона бонусов*',
-  'Белая зона не опасна — здесь ты можешь получить дополнительные рубли и Газики!',
-  'Используй свои знания и собирай бонусы стратегически.',
-  'Помни: чем больше правильных ответов, тем больше наград!'
-];
-
-nextBtn.addEventListener('click', () => {
-  if (dialogIdx < DIALOGS.length) {
-    dialogText.textContent = DIALOGS[dialogIdx];
-    if (dialogIdx === 2) {
-      // Подсветка белых зон
-      setTimeout(() => {
-        document.querySelectorAll('.white-zone').forEach(cell => {
-          cell.classList.add('tutorial');
-          setTimeout(() => cell.classList.remove('tutorial'), 2000);
-        });
-      }, 500);
+  function reconstructPath(prevMap, endKey, startKey) {
+    const path = [];
+    let cur = endKey;
+    while (cur) {
+      path.push(cur);
+      if (cur === startKey) break;
+      cur = prevMap.get(cur);
     }
-    dialogIdx++;
-  } else {
-    dialogText.textContent = 'Попробуй построить путь и собрать все бонусы!';
-    nextBtn.disabled = true;
-    nextBtn.style.display = 'none';
+    return path.reverse();
   }
-});
 
-// Обработчики модальных окон — без изменений
-quizClose.addEventListener('click', () => quizModal.setAttribute('aria-hidden', 'true'));
-closeResult.addEventListener('click', () => {
-  resultModal.setAttribute('aria-hidden', 'true');
-  setTimeout(() => {
-    dialogText.textContent = "Ежедневные награды помогут тебе собрать ещё больше Рубликов и Газиков!";
-    nextBtn.disabled = false;
-    nextBtn.style.display = 'inline-block';
-    nextBtn.textContent = "Посмотреть награды";
+  let flowInProgress = false;
+  function animateFlow(pathKeys) {
+    if (flowInProgress) return;
+    flowInProgress = true;
 
-    nextBtn.onclick = () => {
-      dailyModal.setAttribute('aria-hidden', 'false');
+    document.querySelectorAll('.cell.flow').forEach(el => el.classList.remove('flow'));
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i >= pathKeys.length) {
+        clearInterval(interval);
+        flowInProgress = false;
+        completeLevel();
+        return;
+      }
+      const [r, c] = pathKeys[i].split(',').map(Number);
+      const cell = getCell(r, c);
+      if (cell) cell.classList.add('flow');
+      i++;
+    }, 240);
+  }
+
+  // Завершение уровня
+  function completeLevel() {
+    const baseReward = 20;
+    const pipeBonus = Math.max(0, 30 - pipesUsed * 2);
+    const answerBonus = correctAnswers * 10;
+
+    const totalReward = baseReward + pipeBonus + answerBonus;
+    rubles += totalReward;
+    localStorage.setItem('fg_rub', rubles);
+    localStorage.setItem('fg_gas', finGas);
+
+    resultNote.textContent = `Супер! Тебе опять начислили много Рубликов за успешное прохождение уровня!`;
+    bonusInfo.innerHTML = `
+      <div class="bonus-item">Всего получено: +${totalReward} ₽</div>
+      <div class="bonus-item">Базовая награда: +${baseReward} ₽</div>
+      <div class="bonus-item">Бонус за трубы: +${pipeBonus} ₽</div>
+      <div class="bonus-item">Бонус за ответы: +${answerBonus} ₽</div>
+    `;
+
+    resultModal.setAttribute('aria-hidden', 'false');
+  }
+
+  // Вспомогательные функции
+  function updateHUD() {
+    rublesEl.textContent = rubles;
+    finGasEl.textContent = finGas;
+    playerNameEl.textContent = localStorage.getItem('fg_name') || 'Игрок';
+  }
+
+  // Диалоги (точный сюжет)
+  const DIALOGS = [
+    'Новый уровень – новые приключения!',
+    'В этот раз можешь немного расслабиться, не будет никакого подвоха: ни мошенников, ни соблазна потратить все свои сбережения. ',
+    'Это белая зона бонусов: чтобы получить дополнительные Рублики, тебе нужно выполнить задания. ',
+    'Эта зона никак не влияет на поток ФинГаза, так что если ответишь неправильно - потеряешь только шанс заработать бонусные Рублики. '
+  ];
+
+  nextBtn.addEventListener('click', () => {
+    if (dialogIdx < DIALOGS.length) {
+      dialogText.textContent = DIALOGS[dialogIdx];
+      if (dialogIdx === 2) {
+        // Подсветка белых зон
+        setTimeout(() => {
+          document.querySelectorAll('.white-zone').forEach(cell => {
+            cell.classList.add('tutorial');
+            setTimeout(() => cell.classList.remove('tutorial'), 2000);
+          });
+        }, 500);
+      }
+      dialogIdx++;
+    } else {
+      dialogText.textContent = 'Покоряй свои мечты, герой.';
+      nextBtn.disabled = true;
       nextBtn.style.display = 'none';
-    };
-  }, 500);
-});
-closeDaily.addEventListener('click', () => {
-  dailyModal.setAttribute('aria-hidden', 'true');
-  setTimeout(() => {
-    window.location.href = 'index.html';
-  }, 500);
-});
-// --- Вспомогательная функция для восстановления пути ---
-function reconstructPath(prevMap, endKey, startKey) {
-  const path = [];
-  let cur = endKey;
-  while (cur) {
-    path.push(cur);
-    if (cur === startKey) break;
-    cur = prevMap.get(cur);
-  }
-  return path.reverse();
-}
-
-// --- Анимация потока с завершением уровня ---
-let flowInProgress = false;
-function animateFlow(pathKeys) {
-  if (flowInProgress) return;
-  flowInProgress = true;
-
-  document.querySelectorAll('.cell.flow').forEach(el => el.classList.remove('flow'));
-  let i = 0;
-  const interval = setInterval(() => {
-    if (i >= pathKeys.length) {
-      clearInterval(interval);
-      flowInProgress = false;
-      completeLevel(); // вызываем завершение уровня
-      return;
     }
-    const [r, c] = pathKeys[i].split(',').map(Number);
-    const cell = getCell(r, c);
-    if (cell) cell.classList.add('flow');
-    i++;
-  }, 180);
-}
+  });
 
-// Инициализация уровня 3
-initBoard();
-updateHUD();
-});
+  // Обработчики модальных окон
+  quizClose.addEventListener('click', () => quizModal.setAttribute('aria-hidden', 'true'));
 
-// Инициализация уровня 3
-initBoard();
-updateHUD();
+  closeResult.addEventListener('click', () => {
+    resultModal.setAttribute('aria-hidden', 'true');
+    // Показываем сообщение про ежедневные награды
+    setTimeout(() => {
+      dialogText.textContent = "Ты также можешь получать еще больше Рубликов и Газиков в ежедневных наградах.";
+      nextBtn.disabled = false;
+      nextBtn.style.display = 'inline-block';
+      nextBtn.textContent = "Посмотреть награды";
+
+      nextBtn.onclick = () => {
+        dailyModal.setAttribute('aria-hidden', 'false');
+        nextBtn.style.display = 'none';
+      };
+    }, 500);
+  });
+
+  closeDaily.addEventListener('click', () => {
+    dailyModal.setAttribute('aria-hidden', 'true');
+    // Возвращаем в главное меню
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 500);
+  });
+
+  // Обработчик для перехода на следующий уровень
+  nextLevelBtn.addEventListener('click', () => {
+    dailyModal.setAttribute('aria-hidden', 'true');
+    // Переход на третий уровень
+    setTimeout(() => {
+      window.location.href = 'level4/level4.html';
+    }, 500);
+  });
+
+  // Инициализация
+  initBoard();
+  updateHUD();
 });
