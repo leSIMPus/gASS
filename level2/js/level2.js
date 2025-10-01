@@ -248,7 +248,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Выбор трубы
   window.choosePipe = function(type) {
     selectedPipeType = type;
-    document.querySelectorAll("#pipeChoice .btn").forEach(btn => {
+    // Обновляем обе панели выбора труб (десктопную и мобильную)
+    document.querySelectorAll("#pipeChoice .btn, .pipe-buttons-mobile .btn").forEach(btn => {
       btn.classList.remove("active");
       if (btn.dataset.type === type) {
         btn.classList.add("active");
