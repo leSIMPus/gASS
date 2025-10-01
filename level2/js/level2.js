@@ -1,4 +1,4 @@
-document.adddEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   // DOM элементы
   const boardEl = document.getElementById('board');
   const dialogText = document.getElementById('dialogText');
@@ -248,7 +248,8 @@ document.adddEventListener('DOMContentLoaded', () => {
   // Выбор трубы
   window.choosePipe = function(type) {
     selectedPipeType = type;
-    document.querySelectorAll("#pipeChoice .btn").forEach(btn => {
+    // Обновляем обе панели выбора труб (десктопную и мобильную)
+    document.querySelectorAll("#pipeChoice .btn, .pipe-buttons-mobile .btn").forEach(btn => {
       btn.classList.remove("active");
       if (btn.dataset.type === type) {
         btn.classList.add("active");
@@ -667,4 +668,3 @@ document.adddEventListener('DOMContentLoaded', () => {
   initBoard();
   updateHUD();
 });
-

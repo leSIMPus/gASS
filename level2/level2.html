@@ -13,8 +13,8 @@
   <div class="hud-item">Рублики: <span id="rubles">0</span></div>
 </header>
 
-  <main class="game-area">
-  <!-- Боковая панель -->
+<main class="game-area">
+  <!-- Боковая панель с диалогами Финна -->
   <aside class="side-panel">
     <div class="character">
       <div class="char-img">Ф</div>
@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <!-- Панель выбора трубы -->
+    <!-- Панель выбора трубы для десктопа -->
     <div id="pipeChoice" class="pipe-choice">
       <p>Выберите трубу:</p>
       <div class="pipe-buttons">
@@ -53,16 +53,70 @@
         </button>
       </div>
     </div>
-
   </aside>
 
-  <!-- Игровое поле -->
-  <section class="board-container">
-    <div id="board" class="board" aria-label="Игровое поле"></div>
+  <!-- Основная область с игровым полем и мобильной панелью -->
+  <div class="main-content-area">
+    <!-- Игровое поле -->
+    <section class="board-container">
+      <div id="board" class="board" aria-label="Игровое поле"></div>
+    </section>
 
-    <!-- Анимационные элементы будут создаваться динамически -->
-  </section>
+    <!-- Мобильная панель выбора труб -->
+    <div id="mobilePipePanel" class="mobile-pipe-panel">
+      <div class="pipe-choice-mobile">
+        <p>Выберите трубу:</p>
+        <div class="pipe-buttons-mobile">
+          <button class="btn" data-type="H" onclick="choosePipe('H')">
+            <img src="images/H.png" alt="горизонтальная" class="pipe-img">
+          </button>
+          <button class="btn" data-type="V" onclick="choosePipe('V')">
+            <img src="images/V.png" alt="вертикальная" class="pipe-img">
+          </button>
+          <button class="btn" data-type="LU" onclick="choosePipe('LU')">
+            <img src="images/LU.png" alt="верх-лево" class="pipe-img">
+          </button>
+          <button class="btn" data-type="UR" onclick="choosePipe('UR')">
+            <img src="images/UR.png" alt="верх-право" class="pipe-img">
+          </button>
+          <button class="btn" data-type="LD" onclick="choosePipe('LD')">
+            <img src="images/LD.png" alt="низ-лево" class="pipe-img">
+          </button>
+          <button class="btn" data-type="RD" onclick="choosePipe('RD')">
+            <img src="images/RD.png" alt="низ-право" class="pipe-img">
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 </main>
+
+<!-- Мобильная панель выбора труб (ВНЕ основного контента) -->
+<div id="mobilePipePanel" class="mobile-pipe-panel">
+  <div class="pipe-choice-mobile">
+    <p>Выберите трубу:</p>
+    <div class="pipe-buttons-mobile">
+      <button class="btn" data-type="H" onclick="choosePipe('H')">
+        <img src="images/H.png" alt="горизонтальная" class="pipe-img">
+      </button>
+      <button class="btn" data-type="V" onclick="choosePipe('V')">
+        <img src="images/V.png" alt="вертикальная" class="pipe-img">
+      </button>
+      <button class="btn" data-type="LU" onclick="choosePipe('LU')">
+        <img src="images/LU.png" alt="верх-лево" class="pipe-img">
+      </button>
+      <button class="btn" data-type="UR" onclick="choosePipe('UR')">
+        <img src="images/UR.png" alt="верх-право" class="pipe-img">
+      </button>
+      <button class="btn" data-type="LD" onclick="choosePipe('LD')">
+        <img src="images/LD.png" alt="низ-лево" class="pipe-img">
+      </button>
+      <button class="btn" data-type="RD" onclick="choosePipe('RD')">
+        <img src="images/RD.png" alt="низ-право" class="pipe-img">
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- Модалка с финансовыми вопросами -->
 <div id="quizModal" class="modal" aria-hidden="true">

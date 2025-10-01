@@ -522,34 +522,268 @@ body {
   }
 }
 
-/* Мобильная версия - перенос выбора труб вниз */
-@media (max-width: 768px) {
+/* Общие стили для боковых панелей */
+.side-panel-top, .side-panel-bottom {
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Десктопная версия */
+@media (min-width: 769px) {
   .game-area {
-    flex-direction: column;
-    align-items: center;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 12px;
   }
 
-  .side-panel {
-    width: 100%;
-    max-width: 380px;
+  .side-panel-top {
+    width: 280px;
+    display: block;
+  }
+
+  .side-panel-bottom {
+    display: none; /* Скрываем мобильную панель на десктопе */
+  }
+
+  .board-container {
+    flex: 1;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    position: relative;
   }
 
-  /* Перемещаем панель выбора труб в конец контейнера */
-  .side-panel #pipeChoice {
-    order: 3;
-    margin-top: auto; /* Прижимаем к низу */
-    padding-top: 16px;
-    border-top: 1px solid #f0f0f0;
+  /* Стили для выбора труб на десктопе */
+  .desktop-pipes {
+    margin-top: 16px;
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background: #f8fbff;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
   }
 
-  /* Остальные элементы остаются в обычном порядке */
-  .side-panel .character {
-    order: 1;
+  .desktop-pipes p {
+    margin: 0 0 12px;
+    font-weight: 600;
+    font-size: 15px;
+    color: #333;
   }
 
-  .side-panel .dialog-box {
-    order: 2;
+  .pipe-buttons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .pipe-buttons img.pipe-img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    pointer-events: none;
+  }
+
+  .pipe-choice .btn {
+    min-height: 44px;
+    cursor: pointer;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background: #fff;
+    transition: all 0.2s ease;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+  }
+
+  .pipe-choice .btn:hover {
+    background: #e8f4ff;
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(42, 122, 222, 0.2);
+  }
+
+  .pipe-choice .btn.active {
+    border: 3px solid var(--accent);
+    background: #d6ecff;
+    color: #0e2b36;
+    font-weight: 900;
   }
 }
+
+/* Мобильная версия */
+@media (max-width: 768px) {
+  .game-area {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .side-panel-top {
+    width: 100%;
+    max-width: 380px;
+    order: 1; /* Диалоги Финна сверху */
+  }
+
+  .board-container {
+    order: 2; /* Игровое поле посередине */
+    width: 100%;
+  }
+
+  .side-panel-bottom {
+    display: block; /* Показываем мобильную панель */
+    width: 100%;
+    max-width: 380px;
+    order: 3; /* Выбор труб снизу */
+    margin-top: 10px;
+  }
+
+  /* Скрываем выбор труб в верхней панели на мобильных */
+  .desktop-pipes {
+    display: none;
+  }
+
+  /* Стили для мобильного выбора труб */
+  .mobile-pipes {
+    padding: 12px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background: #f8fbff;
+    text-align: center;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+  }
+
+  .mobile-pipes p {
+    margin: 0 0 12px;
+    font-weight: 600;
+    font-size: 15px;
+    color: #333;
+  }
+
+  /* Трубы в две строки на мобильных */
+  .pipe-buttons-mobile {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+
+  .pipe-buttons-mobile .btn {
+    min-height: 50px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    background: #fff;
+    transition: all 0.2s ease;
+  }
+
+  .pipe-buttons-mobile .btn:hover {
+    background: #e8f4ff;
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(42, 122, 222, 0.2);
+  }
+
+  .pipe-buttons-mobile .btn.active {
+    border: 3px solid var(--accent);
+    background: #d6ecff;
+  }
+
+  .pipe-buttons-mobile .btn img.pipe-img {
+    width: 30px;
+    height: 30px;
+    object-fit: contain;
+    pointer-events: none;
+  }
+}/* Мобильная панель выбора труб */
+ .mobile-pipe-panel {
+   display: none;
+ }
+
+ @media (max-width: 768px) {
+   .game-area {
+     flex-direction: column;
+     align-items: center;
+     margin-bottom: 20px; /* Добавляем отступ снизу для мобильной панели */
+   }
+
+   .mobile-pipe-panel {
+     display: block;
+     width: calc(100% - 24px);
+     max-width: 380px;
+     margin: 0 auto 20px;
+     padding: 16px;
+     background: #fff;
+     border-radius: 12px;
+     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+     border: 2px solid #e0e0e0;
+   }
+
+   /* Скрываем десктопную панель выбора труб на мобильных */
+   .side-panel #pipeChoice {
+     display: none;
+   }
+
+   .pipe-choice-mobile p {
+     margin: 0 0 12px;
+     font-weight: 600;
+     font-size: 15px;
+     color: #333;
+     text-align: center;
+   }
+
+   .pipe-buttons-mobile {
+     display: grid;
+     grid-template-columns: repeat(3, 1fr);
+     gap: 8px;
+   }
+
+   .pipe-buttons-mobile .btn {
+     min-height: 50px;
+     padding: 4px;
+     display: flex;
+     align-items: center;
+     justify-content: center;
+     border: 2px solid #ccc;
+     border-radius: 8px;
+     background: #fff;
+     transition: all 0.2s ease;
+   }
+
+   .pipe-buttons-mobile .btn:hover {
+     background: #e8f4ff;
+     border-color: var(--accent);
+     transform: translateY(-2px);
+     box-shadow: 0 4px 8px rgba(42, 122, 222, 0.2);
+   }
+
+   .pipe-buttons-mobile .btn.active {
+     border: 3px solid var(--accent);
+     background: #d6ecff;
+   }
+
+   .pipe-buttons-mobile .btn img.pipe-img {
+     width: 30px;
+     height: 30px;
+     object-fit: contain;
+     pointer-events: none;
+   }
+ }
+
+ /* На десктопе скрываем мобильную панель */
+ @media (min-width: 769px) {
+   .mobile-pipe-panel {
+     display: none;
+   }
+ }
