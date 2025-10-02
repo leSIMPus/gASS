@@ -230,19 +230,17 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Создание газиков
-  // Создание газиков - ТОЛЬКО 2 ГАЗИКА
-  function spawnGazik() {
-    document.querySelectorAll('.cell.gazik').forEach(cell => {
-      cell.classList.remove('gazik');
-      cell.textContent = '';
-    });
+  function spawnGazik(count = 2) {
+    // Удаляем только собранные газики, а не все
+    const currentGaziks = document.querySelectorAll('.cell.gazik').length;
+    const gaziksToCreate = count - currentGaziks;
 
-    const gazikCount = 2; // Фиксированно 2 газика
+    if (gaziksToCreate <= 0) return;
 
     let placed = 0;
-    const maxAttempts = 50; // Защита от бесконечного цикла
+    const maxAttempts = 50;
 
-    while (placed < gazikCount && maxAttempts > 0) {
+    while (placed < gaziksToCreate && maxAttempts > 0) {
       const r = Math.floor(Math.random() * rows);
       const c = Math.floor(Math.random() * cols);
       const cell = getCell(r, c);
@@ -415,6 +413,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Сбор газика
+  // Сбор газика (исправленная версия)
   function collectGazik(cell) {
     const product = BANK_PRODUCTS[Math.floor(Math.random() * BANK_PRODUCTS.length)];
     productInfo.innerHTML = `
@@ -430,7 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
       gaziksCollected++;
       createFloatingText(cell, '+5 🔥', '#2a7ade', 'gazik-floating');
       cell.classList.remove('gazik');
-      spawnGazik();
+      // УБРАТЬ эту строку: spawnGazik();
       updateHUD();
       checkFlow();
     };
