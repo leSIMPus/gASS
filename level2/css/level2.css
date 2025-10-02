@@ -110,7 +110,7 @@ body {
   color: #333;
 }
 
-/* Игровое поле */
+/* Игровое поле - ВОЗВРАЩАЕМ РАЗМЕРЫ ВТОРОГО УРОВНЯ */
 .board-container {
   flex: 1;
   display: flex;
@@ -119,7 +119,6 @@ body {
   width: 100%;
   padding: 10px;
   min-height: 0;
-  overflow: hidden; 
 }
 
 #board {
@@ -131,21 +130,19 @@ body {
   max-width: 350px;
   height: calc((90vw * 7 / 5));
   max-height: 490px;
-  background: #e9f7ff;
+  background: #bdcefa; /* ЦВЕТ ПОЛЯ КАК В 3 УРОВНЕ */
   border-radius: 8px;
   border: 2px solid rgba(0,0,0,0.05);
   box-shadow: 0 4px 15px rgba(0,0,0,0.05);
   padding: 2px;
-  display: -ms-grid;
-  -ms-grid-columns: repeat(5, 1fr);
-  -ms-grid-rows: repeat(7, 1fr);
 }
+
 .cell {
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 16px;
-  background: #fff;
+  background: #dee1ee; /* ЦВЕТ КЛЕТОК КАК В 3 УРОВНЕ */
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 4px;
   color: var(--accent);
@@ -194,6 +191,7 @@ body {
   }
 }
 
+/* СИНИЙ ОГОНЕЧЕК - ВОЗВРАЩАЕМ! */
 .cell.gazik {
   background: #fff;
   color: #2a7ade;
@@ -360,7 +358,7 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-/* Стили для модальных окон */
+/* Стили для ответов - ТЕПЕРЬ КАК В 3 УРОВНЕ */
 .answers {
   display: flex;
   flex-direction: column;
@@ -368,7 +366,6 @@ body {
   margin-top: 8px;
 }
 
-/* ПРОСТЫЕ СТИЛИ ДЛЯ ОТВЕТОВ - ВЕРНУЛИ ЦВЕТ */
 .answers button {
   padding: 12px;
   border-radius: 8px;
@@ -378,6 +375,7 @@ body {
   transition: all 0.2s;
   font-size: 14px;
   color: #333;
+  width: 100%;
 }
 
 .answers button:hover {
@@ -474,5 +472,28 @@ body {
     flex-direction: row;
     align-items: flex-start;
     padding: 12px;
+  }
+}
+
+/* ИСПРАВЛЕНИЯ ДЛЯ СОВМЕСТИМОСТИ С БРАУЗЕРАМИ */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari */
+  .game-area {
+    height: -webkit-fill-available;
+  }
+}
+
+.cell {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Предотвращение масштабирования на iOS */
+@media (max-width: 768px) {
+  body {
+    touch-action: pan-x pan-y;
   }
 }
