@@ -115,8 +115,7 @@ body {
   margin: 0 0 12px 0;
   color: #333;
 }
-
-/* Игровое поле - ВОЗВРАЩАЕМ РАЗМЕРЫ ВТОРОГО УРОВНЯ */
+/* Игровое поле - ГАРАНТИРУЕМ КВАДРАТНЫЕ КЛЕТКИ */
 .board-container {
   flex: 1;
   display: flex;
@@ -125,26 +124,25 @@ body {
   width: 100%;
   padding: 10px;
   min-height: 0;
-  /* Добавляем возможность скролла ТОЛЬКО если не помещается */
   overflow: auto;
 }
+
 #board {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(7, 1fr);
   gap: 2px;
-  /* ИСПРАВЛЯЕМ РАСЧЕТ РАЗМЕРОВ - ОСНОВЫВАЕМСЯ НА МЕНЬШЕЙ СТОРОНЕ */
-  width: min(90vw, 90vh * 5/7, 350px);
-  height: min(calc(90vw * 7/5), 90vh, 490px);
+  /* ПРОСТОЙ И НАДЕЖНЫЙ РАСЧЕТ */
+  width: 90vmin;
+  height: calc(90vmin * 7 / 5);
+  max-width: 350px;
+  max-height: 490px;
   background: #bdcefa;
   border-radius: 8px;
   border: 2px solid rgba(0,0,0,0.05);
   box-shadow: 0 4px 15px rgba(0,0,0,0.05);
   padding: 2px;
-  /* Запрещаем сжимание */
   flex-shrink: 0;
-  /* Гарантируем квадратные клетки */
-  aspect-ratio: 5/7;
 }
 
 .cell {
@@ -159,10 +157,9 @@ body {
   user-select: none;
   position: relative;
   transition: all 0.2s;
-  /* Гарантируем квадратные клетки */
-  aspect-ratio: 1/1;
+  /* ГАРАНТИЯ КВАДРАТНЫХ КЛЕТОК */
+  aspect-ratio: 1 / 1;
 }
-
 
 .cell:hover {
   transform: scale(1.03);
