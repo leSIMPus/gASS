@@ -1,26 +1,19 @@
-// level1.js — логика уровня 1 (cols=5, rows=8)
-// Подключать в <script src="js/level1.js"></script>
+// логика уровня 1
 
 document.addEventListener('DOMContentLoaded', () => {
-  // -----------------------
-  // DOM (убрал несуществующие селекторы, добавил boardEl)
-  // -----------------------
   const boardEl = document.getElementById('board');
   const dialogOverlay = document.getElementById('dialogOverlay');
   const dialogTextOverlay = document.getElementById('dialogTextOverlay');
   const nextBtnOverlay = document.getElementById('nextBtnOverlay');
-
-  // элементы модалок / HUD
   const rublesEl = document.getElementById('rubles');
   const finGasEl = document.getElementById('finGas');
   const quizModal = document.getElementById('quizModal');
   const quizAnswers = document.getElementById('quizAnswers');
-  const quizClose = document.getElementById('quizClose');
   const resultModal = document.getElementById('resultModal');
   const resultNote = document.getElementById('resultNote');
   const closeResult = document.getElementById('closeResult');
   const dailyModal = document.getElementById('dailyModal');
-  const closeDaily = document.getElementById('closeDaily');
+  const exitToMenu = document.getElementById('exitToMenu');
   const nextLevelBtn = document.getElementById('nextLevel');
   const playerNameEl = document.getElementById('playerName');
   const bonusInfo = document.getElementById('bonusInfo');
@@ -28,23 +21,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const redZoneIntroModal = document.getElementById('redZoneIntroModal');
   const redZoneIntroClose = document.getElementById('redZoneIntroClose');
 
-  // Базовая защита: если board отсутствует — прекращаем.
+
   if (!boardEl) {
     console.error('level1.js: элемент #board не найден в DOM. Исправь HTML или путь к файлу.');
     return;
   }
 
-  // -----------------------
-  // state
-  // -----------------------
+
   const cols = 5;
-  const rows = 7; // Важно: rows должно соответствовать реальному числу строк в логике (start = rows-1)
-  let grid = []; // grid[row][col] => cell element
+  const rows = 7;
+  let grid = [];
   let selectedPipeType = null;
   let rubles = Number(localStorage.getItem('fg_rub')) || 0;
   let finGas = Number(localStorage.getItem('fg_gas')) || 100;
-  let dialogIndex = 0;            // индекс текущего сообщения в активном диалоге
-  let currentDialog = null;       // null | "intro" | "firstPipe"
+  let dialogIndex = 0;
+  let currentDialog = null;
   let pipesUsed = 0;
   let correctAnswers = 0;
   let usedQuestions = new Set();
@@ -53,17 +44,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
-  // -----------------------
   // направления и типы труб
-  // -----------------------
   const DIRS = { t: [-1, 0], r: [0, 1], b: [1, 0], l: [0, -1] };
   const OPP = { t: 'b', b: 't', l: 'r', r: 'l' };
   const DIR_KEYS = Object.keys(DIRS);
 
   const FINANCE_QUESTIONS = [
-    // ... (оставляем те же вопросы, что у тебя) ...
     { q: "Кто-то звонит и просит данные карты. Что делать?", answers: [{ text: "Повесить трубку и позвонить в банк", correct: true }, { text: "Назвать номер карты и код", correct: false }, { text: "Спросить у звонящего, прошёл ли платёж", correct: false }] },
-    // остальные вопросы...
   ];
 
   const TYPE_DEFS = {
@@ -75,9 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     UR: { dirs: ["r", "t"], img: "images/UR.png" }
   };
 
-  // -----------------------
   // утилиты
-  // -----------------------
   function getPipeDirsFromType(type) {
     if (!type) return [];
     const def = TYPE_DEFS[type];
@@ -109,9 +94,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return grid[r][c];
   }
 
-  // -----------------------
+
   // построение поля
-  // -----------------------
   function initBoard() {
     boardEl.innerHTML = '';
     grid = [];
@@ -131,7 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
       grid.push(row);
     }
 
-    // start и goal — вычисляем динамически на основе rows/cols
     const start = getCell(rows - 1, 0);
     if (start) {
       start.classList.add('start');
@@ -147,7 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
     placeRedZones();
 
     updateHUD();
-    // tutorial highlight на старте
+
     highlightCell(rows - 1, 0, 1200);
   }
 
@@ -171,9 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => cell.classList.remove('tutorial'), ms);
   }
 
-  // -----------------------
   // выбор трубы из UI
-  // -----------------------
   window.choosePipe = function(type) {
     selectedPipeType = type;
     // Поддерживаем оба варианта: десктопные и мобильные панели
@@ -183,70 +164,84 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  // -----------------------
-  // проверка установки трубы (логика совместимости)
-  // -----------------------
-  function canPlacePipe(r, c, type) {
-    if (!TYPE_DEFS[type]) return false;
-    const dirs = getPipeDirsFromType(type);
-    const targetCell = getCell(r, c);
-    if (targetCell && targetCell.dataset.pipeFixed) return false;
-
-    // 1) если у нас есть выход к соседу — проверяем, что сосед (если труба есть) смотрит на нас
-    for (const dir of dirs) {
-      const [dr, dc] = DIRS[dir];
-      const neigh = getCell(r + dr, c + dc);
-      if (!neigh) continue;
-      if (!neigh.dataset.pipe) continue;
-      const neighDirs = getPipeDirsFromCell(neigh);
-      const opp = OPP[dir];
-      if (!neighDirs.includes(opp)) return false;
+  // Проверка возможности установки трубы
+    function hasAdjacentPipe(r, c) {
+      for (const dir of DIR_KEYS) {
+        const [dr, dc] = DIRS[dir];
+        const neigh = getCell(r + dr, c + dc);
+        if (!neigh) continue;
+        if (neigh.dataset.pipe || neigh.classList.contains('start')) {
+          return true;
+        }
+      }
+      return false;
     }
 
-    // 2) если сосед смотрит в нашу сторону, мы должны смотреть в его
-    for (const dirKey of DIR_KEYS) {
-      const [dr, dc] = DIRS[dirKey];
-      const neigh = getCell(r + dr, c + dc);
-      if (!neigh) continue;
-      if (!neigh.dataset.pipe) continue;
-      const neighDirs = getPipeDirsFromCell(neigh);
-      const opp = OPP[dirKey];
-      if (neighDirs.includes(opp) && !dirs.includes(dirKey)) return false;
-    }
-    return true;
-  }
+    // Проверяем корректность стыковки с соседями
+    function canConnectPipe(r, c, type) {
+      if (!TYPE_DEFS[type]) return false;
+      const dirs = getPipeDirsFromType(type);
+      const targetCell = getCell(r, c);
+      if (!targetCell || targetCell.dataset.pipeFixed) return false;
 
-  // -----------------------
-  // клик по клетке
-  // -----------------------
-  function onCellClick(r, c) {
-    const cell = getCell(r, c);
-    if (!cell) return;
-    if (cell.classList.contains('start') || cell.classList.contains('goal')) return;
+      for (const dir of dirs) {
+        const [dr, dc] = DIRS[dir];
+        const neigh = getCell(r + dr, c + dc);
+        if (!neigh || !neigh.dataset.pipe) continue;
+        const neighDirs = getPipeDirsFromCell(neigh);
+        const opp = OPP[dir];
+        if (!neighDirs.includes(opp)) return false;
+      }
 
-    if (cell.dataset.pipe) {
-      cell.animate([{transform:'scale(1)'},{transform:'scale(1.04)'},{transform:'scale(1)'}],{duration:180});
-      return;
-    }
-    if (!selectedPipeType) {
-      alert('Сначала выберите трубу внизу.');
-      return;
-    }
-    if (!canPlacePipe(r, c, selectedPipeType)) {
-      alert('Эта труба не стыкуется с соседними!');
-      return;
+      for (const dirKey of DIR_KEYS) {
+        const [dr, dc] = DIRS[dirKey];
+        const neigh = getCell(r + dr, c + dc);
+        if (!neigh || !neigh.dataset.pipe) continue;
+        const neighDirs = getPipeDirsFromCell(neigh);
+        const opp = OPP[dirKey];
+        if (neighDirs.includes(opp) && !dirs.includes(dirKey)) return false;
+      }
+
+      return true;
     }
 
-    renderPipe(cell, selectedPipeType);
-    pipesUsed++;
+    // Обработка клика по клетке
+    function onCellClick(r, c) {
+      const cell = getCell(r, c);
+      if (!cell) return;
+      if (cell.classList.contains('start') || cell.classList.contains('goal')) return;
+
+      if (cell.dataset.pipe) {
+        cell.animate([{transform:'scale(1)'},{transform:'scale(1.04)'},{transform:'scale(1)'}], {duration:180});
+        return;
+      }
+
+      if (!selectedPipeType) {
+        alert('Сначала выберите трубу внизу.');
+        return;
+      }
+
+      // Сначала проверяем соседство
+      if (!hasAdjacentPipe(r, c)) {
+        alert('Нельзя ставить трубу сюда: нет соседней трубы или стартовой клетки!');
+        return;
+      }
+
+      // Проверяем корректность стыковки
+      if (!canConnectPipe(r, c, selectedPipeType)) {
+        alert('Эта труба не стыкуется с соседними!');
+        return;
+      }
+
+      // Установка трубы
+      renderPipe(cell, selectedPipeType);
+      pipesUsed++;
 
 
-    // проверка: первая труба → мини-диалог
-    // проверка: первая труба → мини-диалог (через showDialog)
     if (pipesUsed === 1) {
       isFirstPipeDialogActive = true;
       showDialog(FIRST_PIPE_DIALOGS, 'firstPipe');
-      return; // не продолжаем игру, пока диалог не закончен
+      return;
     }
 
 
@@ -262,13 +257,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // -----------------------
-  // red-zone intro
-  // -----------------------
+
   function showRedZoneIntro(cell) {
     hasSeenRedZoneIntro = true;
     if (!redZoneIntroModal) {
-      // если модалки нет — просто открываем квиз
       openFinanceQuiz(cell);
       return;
     }
@@ -279,9 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // -----------------------
   // квиз
-  // -----------------------
   function openFinanceQuiz(cell) {
     let availableQuestions = FINANCE_QUESTIONS.filter(q => !usedQuestions.has(q.q));
     if (availableQuestions.length === 0) {
@@ -307,6 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
           createFloatingText(cell, '+15 ₽', 'gold');
         } else {
           finGas = Math.max(0, finGas - 20);
+          createFloatingText(cell, '-20 ФинГаза', 'red');
         }
         updateHUD();
         cell.classList.remove('red-zone');
@@ -318,11 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
     quizModal.setAttribute('aria-hidden', 'false');
   }
 
-  quizClose.addEventListener('click', () => quizModal.setAttribute('aria-hidden', 'true'));
-
-  // -----------------------
   // вспомогательная анимация текста (+15 и т.п.)
-  // -----------------------
   function createFloatingText(cell, text, color, className = '') {
     if (!cell) return;
     const floatingText = document.createElement('div');
@@ -356,9 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 100);
   }
 
-  // -----------------------
-  // проверка потока (BFS) — теперь старт/цель вычисляются динамически
-  // -----------------------
+
   function checkFlow() {
     const start = { r: rows - 1, c: 0 };
     const goal = { r: 0, c: cols - 1 };
@@ -425,9 +410,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return path.reverse();
   }
 
-  // -----------------------
+
   // анимация потока и завершение уровня
-  // -----------------------
   let flowInProgress = false;
   function animateFlow(pathKeys) {
     if (flowInProgress) return;
@@ -470,9 +454,8 @@ document.addEventListener('DOMContentLoaded', () => {
     resultModal.setAttribute('aria-hidden', 'false');
   }
 
-  // -----------------------
+
   // HUD + диалоги
-  // -----------------------
   function updateHUD() {
     if (rublesEl) rublesEl.textContent = rubles;
     if (finGasEl) finGasEl.textContent = finGas;
@@ -494,7 +477,6 @@ document.addEventListener('DOMContentLoaded', () => {
     "Позже я объясню зачем они нужны. Удачи, дорогой друг!"
   ];
 
-   // универсальная функция
     function showDialog(dialogs, mode) {
       currentDialog = mode;
       dialogIndex = 0;
@@ -504,7 +486,6 @@ document.addEventListener('DOMContentLoaded', () => {
       nextBtnOverlay.textContent = 'Далее';
     }
 
-    // единый обработчик кнопки
     nextBtnOverlay.onclick = () => {
       if (!currentDialog) return;
       const dialogs = currentDialog === 'intro' ? DIALOGS : FIRST_PIPE_DIALOGS;
@@ -526,12 +507,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // запуск стартового диалога
     showDialog(DIALOGS, 'intro');
 
-  // -----------------------
+
   // обработчики модалок и навигация
-  // -----------------------
   closeResult.addEventListener('click', () => {
     resultModal.setAttribute('aria-hidden', 'true');
-    // показываем подсказку про награды в overlay (переназначаем overlay)
     if (dialogTextOverlay && nextBtnOverlay) {
       dialogTextOverlay.textContent = "Ты также можешь получать еще больше Рубликов в ежедневных наградах.";
       nextBtnOverlay.disabled = false;
@@ -545,28 +524,24 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  closeDaily.addEventListener('click', () => {
+  exitToMenu.addEventListener('click', () => {
     dailyModal.setAttribute('aria-hidden', 'true');
-    setTimeout(() => { window.location.href = 'index.html'; }, 500);
+    setTimeout(() => { window.location.href = '../menu.html'; }, 500);
   });
 
   if (nextLevelBtn) {
     nextLevelBtn.addEventListener('click', () => {
       dailyModal.setAttribute('aria-hidden', 'true');
-      setTimeout(() => { window.location.href = 'level2.html'; }, 500);
+      setTimeout(() => { window.location.href = '../level2/level2.html'; }, 500);
     });
   }
 
-  // -----------------------
-  // init
-  // -----------------------
   initBoard();
   updateHUD();
 
   adjustLayoutForViewport();
   window.addEventListener('resize', adjustLayoutForViewport);
 
-  // экспорт для отладки
   window._fg = { grid, checkFlow };
 });
 function adjustLayoutForViewport() {
@@ -575,7 +550,6 @@ function adjustLayoutForViewport() {
   const boardContainer = document.querySelector('.board-container');
   const mobilePanel = document.getElementById('mobilePipePanel');
 
-  // Если высота viewport меньше 700px, включаем компактный режим
   if (viewportHeight < 700) {
     document.body.style.overflowY = 'auto';
     if (boardContainer) {

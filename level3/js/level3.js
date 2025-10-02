@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // DOM элементы
   const boardEl = document.getElementById('board');
   const exitToMenu = document.getElementById('exitToMenu');
   const dialogOverlay = document.getElementById('dialogOverlay');
@@ -21,15 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeResult = document.getElementById('closeResult');
   const dailyModal = document.getElementById('dailyModal');
   const closeDaily = document.getElementById('closeDaily');
-  const nextLevelBtn = document.getElementById('nextLevel'); // Новая кнопка
+  const nextLevelBtn = document.getElementById('nextLevel');
   const playerNameEl = document.getElementById('playerName');
   const nextLevelResult = document.getElementById('nextLevelResult');
-
-  // Новые элементы для обучающих модалок
   const whiteZoneIntroModal = document.getElementById('whiteZoneIntroModal');
   const whiteZoneIntroClose = document.getElementById('whiteZoneIntroClose');
 
-  // состояние игры
   const rows = 7, cols = 5;
   let grid = [];
   let selectedPipeType = null;
@@ -197,7 +193,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Выбор трубы
   window.choosePipe = function(type) {
     selectedPipeType = type;
-    // Обновляем обе панели выбора труб (десктопную и мобильную)
     document.querySelectorAll("#pipeChoice .btn, .pipe-buttons-mobile .btn").forEach(btn => {
       btn.classList.remove("active");
       if (btn.dataset.type === type) {
@@ -282,13 +277,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // Проверка специальных клеток
     if (cell.classList.contains('white-zone')) {
       if (!hasSeenWhiteZoneIntro) {
-        // Первый раз на белой зоне - показываем объяснение
         showWhiteZoneIntro(cell);
       } else {
         openFinanceQuiz(cell);
       }
     } else {
-      // Обычная клетка - сразу проверяем поток
       checkFlow();
     }
   }
@@ -359,7 +352,6 @@ document.addEventListener('DOMContentLoaded', () => {
       opacity: 1;
     `;
 
-    // ДОБАВЛЯЕМ эту проверку для класса:
     if (className) {
       floatingText.className = className;
     }
@@ -541,7 +533,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         dialogIdx++;
       } else {
-        // Скрываем диалоговое окно после завершения
         dialogOverlay.style.display = 'none';
       }
     });
@@ -549,34 +540,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
   exitToMenu.addEventListener('click', () => {
     dailyModal.setAttribute('aria-hidden', 'true');
-    // Возвращаем в главное меню
     setTimeout(() => {
       window.location.href = '../menu.html';
     }, 500);
   });
 
 
-  // Обработчик для перехода на следующий уровень
   nextLevelBtn.addEventListener('click', () => {
     dailyModal.setAttribute('aria-hidden', 'true');
-    // Переход на четвертый уровень
     setTimeout(() => {
-      window.location.href = 'level4/level4.html';
+      window.location.href = ' ';
     }, 500);
   });
 
-  // Инициализация
   initBoard();
   updateHUD();
 });
-// ДОБАВЬТЕ эту функцию в раздел вспомогательных функций
+
+
 function adjustLayoutForViewport() {
   const viewportHeight = window.innerHeight;
   const gameArea = document.querySelector('.game-area');
   const boardContainer = document.querySelector('.board-container');
   const mobilePanel = document.getElementById('mobilePipePanel');
 
-  // Если высота viewport меньше 700px, включаем компактный режим
   if (viewportHeight < 700) {
     document.body.style.overflowY = 'auto';
     if (boardContainer) {

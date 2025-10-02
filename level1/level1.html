@@ -20,7 +20,7 @@
     <div id="dialogOverlay" class="dialog-overlay">
         <div class="dialog-box-overlay">
             <div class="character-overlay">
-                <div class="char-img">Ф</div>
+                <img src="images/finn_head_with_mouth.png" alt="Финн" class="char-img">
                 <div class="char-name">Финн</div>
             </div>
             <p id="dialogTextOverlay">Привет! Я Финн — хранитель знаний о финансах.</p>
@@ -67,7 +67,6 @@
         <h3>Красная зона</h3>
         <p id="quizQuestion">Вопрос по финансовой грамотности</p>
         <div class="answers" id="quizAnswers"></div>
-        <div style="margin-top:10px"><button id="quizClose" class="btn ghost">Отмена</button></div>
     </div>
 </div>
 
@@ -89,7 +88,7 @@
         <h3>Уровень 1 завершён</h3>
         <p id="resultNote"></p>
         <div id="bonusInfo"></div>
-        <div style="margin-top:12px">
+        <div style="margin-top:12px; display: flex; gap: 10px; justify-content: center;">
             <button id="closeResult" class="btn">ОК</button>
         </div>
     </div>
@@ -108,7 +107,7 @@
             <div class="reward-day"><span>День 7</span><br>+100 ⚡ +100 ₽</div>
         </div>
         <div style="margin-top:12px; display: flex; gap: 10px; justify-content: center;">
-            <button id="closeDaily" class="btn ghost">На главную</button>
+            <button id="exitToMenu" class="btn ghost">На главную</button>
             <button id="nextLevel" class="btn">Следующий уровень</button>
         </div>
     </div>

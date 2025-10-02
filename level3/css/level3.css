@@ -17,7 +17,6 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  /* ВОЗВРАЩАЕМ overflow: hidden для основного контента */
   overflow: hidden;
 }
 
@@ -25,7 +24,6 @@ body {
   font-family: Inter, Arial, sans-serif;
   background: linear-gradient(180deg, var(--bg1), var(--bg2));
   color: #0e2b36;
-  /* Используем flex для правильного распределения пространства */
   display: flex;
   flex-direction: column;
 }
@@ -41,7 +39,7 @@ body {
   flex-wrap: wrap;
   font-size: 14px;
   height: 50px;
-  flex-shrink: 0; /* Не сжимаем HUD */
+  flex-shrink: 0;
 }
 
 .hud-item {
@@ -55,9 +53,9 @@ body {
 .game-area {
   display: flex;
   flex-direction: column;
-  flex: 1; /* Занимаем все оставшееся пространство */
+  flex: 1;
   position: relative;
-  min-height: 0; /* Важно для flex-контейнера */
+  min-height: 0;
 }
 
 .dialog-overlay {
@@ -123,7 +121,6 @@ body {
   padding: 10px;
   min-height: 0;
   background: #bdcefa;
-  /* Добавляем возможность скролла ТОЛЬКО если не помещается */
   overflow: auto;
 }
 #board {
@@ -131,7 +128,6 @@ body {
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(7, 1fr);
   gap: 2px;
-  /* ИСПРАВЛЯЕМ РАСЧЕТ РАЗМЕРОВ - ОСНОВЫВАЕМСЯ НА МЕНЬШЕЙ СТОРОНЕ */
   width: min(90vw, 90vh * 5/7, 350px);
   height: min(calc(90vw * 7/5), 90vh, 490px);
   background: #bdcefa;
@@ -139,9 +135,7 @@ body {
   border: 2px solid rgba(0,0,0,0.05);
   box-shadow: 0 4px 15px rgba(0,0,0,0.05);
   padding: 2px;
-  /* Запрещаем сжимание */
   flex-shrink: 0;
-  /* Гарантируем квадратные клетки */
   aspect-ratio: 5/7;
 }
 
@@ -157,7 +151,6 @@ body {
   user-select: none;
   position: relative;
   transition: all 0.2s;
-  /* Гарантируем квадратные клетки */
   aspect-ratio: 1/1;
 }
 
@@ -243,14 +236,13 @@ body {
   box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.04);
 }
 
-/* Мобильная панель выбора труб - ФИКСИРОВАННАЯ ВЫСОТА */
 .mobile-pipe-panel {
   width: 100%;
   padding: 8px 12px;
   background: #fff;
   border-top: 2px solid #e0e0e0;
-  flex-shrink: 0; /* Не сжимаем панель */
-  height: 70px; /* Фиксированная высота */
+  flex-shrink: 0;
+  height: 70px;
 }
 
 .pipe-choice-mobile p {
@@ -350,7 +342,6 @@ body {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-/* Стили для ответов - ТЕПЕРЬ КАК В 3 УРОВНЕ */
 .answers {
   display: flex;
   flex-direction: column;
@@ -439,18 +430,17 @@ body {
   }
 }
 
-/* Стиль для tutorial подсветки */
 .cell.tutorial {
   box-shadow: 0 0 0 3px var(--accent);
   z-index: 10;
 }
 
-/* Скрываем боковую панель на мобильных */
+
 .side-panel {
   display: none;
 }
 
-/* Десктопная версия */
+
 @media (min-width: 769px) {
   .mobile-pipe-panel {
     display: none;
@@ -467,9 +457,7 @@ body {
   }
 }
 
-/* ИСПРАВЛЕНИЯ ДЛЯ СОВМЕСТИМОСТИ С БРАУЗЕРАМИ */
 @supports (-webkit-touch-callout: none) {
-  /* iOS Safari */
   .game-area {
     height: -webkit-fill-available;
   }
@@ -483,15 +471,12 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Предотвращение масштабирования на iOS */
 @media (max-width: 768px) {
   body {
     touch-action: pan-x pan-y;
   }
 }
 
-/* АДАПТАЦИЯ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ */
-/* АДАПТАЦИЯ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ */
 @media (max-height: 700px) {
   .board-container {
     padding: 5px;
@@ -521,7 +506,6 @@ body {
   }
 }
 
-/* Для очень маленьких экранов */
 @media (max-height: 600px) {
   #board {
     width: min(80vw, 80vh * 5/7, 300px);
@@ -546,7 +530,6 @@ body {
   }
 }
 
-/* Для экстремально маленьких экранов */
 @media (max-height: 500px) {
   #board {
     width: min(75vw, 75vh * 5/7, 280px);
@@ -569,7 +552,6 @@ body {
   }
 }
 
-/* Отключаем скроллинг на больших экранах */
 @media (min-height: 800px) {
   .board-container {
     overflow: hidden;

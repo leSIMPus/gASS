@@ -1,5 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-  // DOM элементы
   const boardEl = document.getElementById('board');
   const dialogOverlay = document.getElementById('dialogOverlay');
   const dialogTextOverlay = document.getElementById('dialogTextOverlay');
@@ -20,12 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeResult = document.getElementById('closeResult');
   const dailyModal = document.getElementById('dailyModal');
   const closeDaily = document.getElementById('closeDaily');
-  const nextLevelBtn = document.getElementById('nextLevel'); // Новая кнопка
+  const nextLevelBtn = document.getElementById('nextLevel');
   const playerNameEl = document.getElementById('playerName');
   const nextLevelResult = document.getElementById('nextLevelResult');
   const exitToMenu = document.getElementById('exitToMenu');
-
-  // Новые элементы для обучающих модалок
   const yellowZoneIntroModal = document.getElementById('yellowZoneIntroModal');
   const yellowZoneIntroClose = document.getElementById('yellowZoneIntroClose');
   const gazikIntroModal = document.getElementById('gazikIntroModal');
@@ -53,12 +50,12 @@ document.addEventListener('DOMContentLoaded', () => {
   const DIR_KEYS = Object.keys(DIRS);
 
   const TYPE_DEFS = {
-    H:  { sym: "━", dirs: ["l", "r"] },    // горизонтальная
-    V:  { sym: "┃", dirs: ["t", "b"] },    // вертикальная
-    LD: { sym: "┐", dirs: ["l", "b"] },    // лево-низ
-    RD: { sym: "┌", dirs: ["r", "b"] },    // право-низ
-    LU: { sym: "┘", dirs: ["l", "t"] },    // лево-верх
-    UR: { sym: "└", dirs: ["r", "t"] }     // право-верх
+    H:  { sym: "━", dirs: ["l", "r"] },
+    V:  { sym: "┃", dirs: ["t", "b"] },
+    LD: { sym: "┐", dirs: ["l", "b"] },
+    RD: { sym: "┌", dirs: ["r", "b"] },
+    LU: { sym: "┘", dirs: ["l", "t"] },
+    UR: { sym: "└", dirs: ["r", "t"] }
   };
 
   // Вопросы для желтых зон
@@ -232,7 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Создание газиков
   function spawnGazik(count = 2) {
-    // Удаляем только собранные газики, а не все
     const currentGaziks = document.querySelectorAll('.cell.gazik').length;
     const gaziksToCreate = count - currentGaziks;
 
@@ -261,7 +257,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Выбор трубы
   window.choosePipe = function(type) {
     selectedPipeType = type;
-    // Обновляем обе панели выбора труб (десктопную и мобильную)
     document.querySelectorAll("#pipeChoice .btn, .pipe-buttons-mobile .btn").forEach(btn => {
       btn.classList.remove("active");
       if (btn.dataset.type === type) {
@@ -272,20 +267,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
  //проверка
   function hasAdjacentPipe(r, c) {
-    // Проверяем все четыре направления
     const neighbors = [
-      {r: r-1, c: c},   // верх
-      {r: r+1, c: c},   // низ
-      {r: r, c: c-1},   // лево
-      {r: r, c: c+1}    // право
+      {r: r-1, c: c},
+      {r: r+1, c: c},
+      {r: r, c: c-1},
+      {r: r, c: c+1}
     ];
 
     for (const neighbor of neighbors) {
-      // Проверяем, что координаты в пределах поля
       if (neighbor.r >= 0 && neighbor.r < rows && neighbor.c >= 0 && neighbor.c < cols) {
         const cell = getCell(neighbor.r, neighbor.c);
 
-        // Если клетка существует и у нее есть труба ИЛИ это старт/финиш
         if (cell && (cell.dataset.pipe || cell.classList.contains('start') || cell.classList.contains('goal'))) {
           return true;
         }
@@ -301,7 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const targetCell = getCell(r, c);
     if (targetCell && targetCell.dataset.pipeFixed) return false;
-    if (targetCell && targetCell.dataset.pipe) return false; // Уже есть труба
+    if (targetCell && targetCell.dataset.pipe) return false;
 
     // Проверяем, что для каждого направления текущей трубы, сосед в этом направлении (если есть труба) имеет противоположное направление
     for (const dir of dirs) {
@@ -324,7 +316,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!neigh.dataset.pipe) continue;
       const neighDirs = getPipeDirsFromCell(neigh);
       const opp = OPP[dirKey];
-      // Если сосед смотрит на текущую клетку, то текущая труба должна смотреть на соседа
       if (neighDirs.includes(opp) && !dirs.includes(dirKey)) {
         return false;
       }
@@ -360,7 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Обработка специальных клеток ПЕРЕД установкой трубы
     if (cell.classList.contains('yellow-zone')) {
       if (!hasSeenYellowZoneIntro) {
         showYellowZoneIntro(cell);
@@ -371,14 +361,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!hasSeenGazikiIntro) {
         showGazikiIntro(cell);
       } else {
-        // Для газика сначала собираем его, потом ставим трубу
         collectGazik(cell, () => {
-          // Колбэк, который выполнится после сбора газика
           renderPipe(cell, selectedPipeType);
           pipesUsed++;
           checkFlow();
         });
-        return; // Выходим, не ставя трубу сразу
+        return;
       }
     }
 
@@ -404,16 +392,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Введение про Газики (при первом входе на газик)
-  // Введение про Газики (при первом входе на газик)
   function showGazikiIntro(cell) {
     hasSeenGazikiIntro = true;
     gazikIntroModal.setAttribute('aria-hidden', 'false');
 
     gazikIntroClose.onclick = () => {
       gazikIntroModal.setAttribute('aria-hidden', 'true');
-      // После вводного окна сразу собираем газик
       collectGazik(cell, () => {
-        // Колбэк, который выполнится после сбора газика
         renderPipe(cell, selectedPipeType);
         pipesUsed++;
         checkFlow();
@@ -438,7 +423,6 @@ document.addEventListener('DOMContentLoaded', () => {
     question.answers.forEach(opt => {
       const btn = document.createElement('button');
       btn.textContent = opt.text;
-      // УБИРАЕМ специальные классы и оставляем обычную кнопку
       btn.addEventListener('click', () => {
         quizModal.setAttribute('aria-hidden', 'true');
         if (opt.correct) {
@@ -446,8 +430,8 @@ document.addEventListener('DOMContentLoaded', () => {
           rubles += 15;
           createFloatingText(cell, '+15 ₽', 'gold');
         } else {
-          finGas = Math.max(0, finGas - 25);
-          createFloatingText(cell, '-25 ₽', 'gold');
+          rubles -= 25;
+          createFloatingText(cell, '-25 ₽', 'red');
         }
         updateHUD();
         cell.classList.remove('yellow-zone');
@@ -477,7 +461,6 @@ document.addEventListener('DOMContentLoaded', () => {
       cell.classList.remove('gazik');
       updateHUD();
 
-      // Вызываем колбэк после сбора газика
       if (callback) {
         callback();
       }
@@ -501,7 +484,6 @@ document.addEventListener('DOMContentLoaded', () => {
       opacity: 1;
     `;
 
-    // сюда эту проверку для класса:
     if (className) {
       floatingText.className = className;
     }
@@ -749,7 +731,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         dialogIdx++;
       } else {
-        // Скрываем диалоговое окно после завершения
         dialogOverlay.style.display = 'none';
       }
     });
@@ -760,7 +741,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   nextLevelResult.addEventListener('click', () => {
     resultModal.setAttribute('aria-hidden', 'true');
-    // Переход на третий уровень
     setTimeout(() => {
       window.location.href = '../level3/level3.html';
     }, 300);
@@ -768,7 +748,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   exitToMenu.addEventListener('click', () => {
     dailyModal.setAttribute('aria-hidden', 'true');
-    // Возвращаем в главное меню
     setTimeout(() => {
       window.location.href = '../menu.html';
     }, 500);
@@ -777,7 +756,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // Обработчик для перехода на следующий уровень
   nextLevelBtn.addEventListener('click', () => {
     dailyModal.setAttribute('aria-hidden', 'true');
-    // Переход на третий уровень
     setTimeout(() => {
       window.location.href = '.../level3.html';
     }, 500);
@@ -793,7 +771,6 @@ function adjustLayoutForViewport() {
   const boardContainer = document.querySelector('.board-container');
   const mobilePanel = document.getElementById('mobilePipePanel');
 
-  // Если высота viewport меньше 700px, включаем компактный режим
   if (viewportHeight < 700) {
     document.body.style.overflowY = 'auto';
     if (boardContainer) {
