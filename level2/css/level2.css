@@ -420,7 +420,7 @@ body {
 }
 
 .product-info {
-  text-align: left;
+  text-align: center;
   margin: 12px 0;
   padding: 12px;
   background: #f9f9f9;
@@ -618,4 +618,33 @@ body {
   .board-container {
     overflow: hidden;
   }
+}
+.cell.yellow-zone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.cell.gazik {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.cell.yellow-zone span {
+  display: block;
+  text-align: center;
+  width: 100%;
+}
+
+#yellowZoneIntroModal .product-info,
+#gazikIntroModal .product-info {
+  text-align: center;
+}
+
+#yellowZoneIntroModal .product-info p,
+#gazikIntroModal .product-info p {
+  margin: 6px 0;
 }
