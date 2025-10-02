@@ -704,5 +704,3 @@ function adjustLayoutForViewport() {
     document.body.style.overflowY = 'hidden';
   }
 }
-
-
