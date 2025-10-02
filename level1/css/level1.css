@@ -1,126 +1,423 @@
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>FinGas — Уровень 1</title>
-    <link rel="stylesheet" href="css/level1.css">
-</head>
-<body>
-<header class="hud">
-    <div class="hud-item">Игрок: <span id="playerName">Игрок</span></div>
-    <div class="hud-item">ФинГаз: <span id="finGas">100</span></div>
-    <div class="hud-item">Рублики: <span id="rubles">0</span></div>
-</header>
+:root {
+  --bg1: #f0f8ff;
+  --bg2: #e6f3ff;
+  --accent: #2a7ade;
+  --danger: #e04646;
+  --warning: #ffa726;
+  --flow: #00c3ff;
+  --goal: #ff9f1a;
+  --extra: #b388eb;
+}
 
-<main class="game-area">
-    <!-- Временное диалоговое окно поверх игрового поля -->
-    <div id="dialogOverlay" class="dialog-overlay">
-        <div class="dialog-box-overlay">
-            <div class="character-overlay">
-                <div class="char-img">Ф</div>
-                <div class="char-name">Финн</div>
-            </div>
-            <p id="dialogTextOverlay">Привет! Я Финн — хранитель знаний о финансах.</p>
-            <button id="nextBtnOverlay" class="btn">Далее</button>
-        </div>
-    </div>
+* {
+  box-sizing: border-box;
+}
 
-    <!-- Игровое поле -->
-    <section class="board-container">
-        <div id="board" class="board" aria-label="Игровое поле"></div>
-    </section>
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;   /* 🚫 убрали скролл */
+}
 
-    <!-- Мобильная панель выбора труб -->
-    <div id="mobilePipePanel" class="mobile-pipe-panel">
-        <div class="pipe-choice-mobile">
-            <p>Выберите трубу:</p>
-            <div class="pipe-buttons-mobile">
-                <button class="btn" data-type="H" onclick="choosePipe('H')">
-                    <img src="images/H.png" alt="горизонтальная" class="pipe-img">
-                </button>
-                <button class="btn" data-type="V" onclick="choosePipe('V')">
-                    <img src="images/V.png" alt="вертикальная" class="pipe-img">
-                </button>
-                <button class="btn" data-type="LU" onclick="choosePipe('LU')">
-                    <img src="images/LU.png" alt="верх-лево" class="pipe-img">
-                </button>
-                <button class="btn" data-type="UR" onclick="choosePipe('UR')">
-                    <img src="images/UR.png" alt="верх-право" class="pipe-img">
-                </button>
-                <button class="btn" data-type="LD" onclick="choosePipe('LD')">
-                    <img src="images/LD.png" alt="низ-лево" class="pipe-img">
-                </button>
-                <button class="btn" data-type="RD" onclick="choosePipe('RD')">
-                    <img src="images/RD.png" alt="низ-право" class="pipe-img">
-                </button>
-            </div>
-        </div>
-    </div>
-</main>
+body {
+  font-family: Inter, Arial, sans-serif;
+  background: linear-gradient(180deg, var(--bg1), var(--bg2));
+  color: #0e2b36;
+  display: flex;
+  flex-direction: column;
+}
 
-<!-- Модальные окна -->
-<div id="quizModal" class="modal" aria-hidden="true">
-    <div class="modal-content">
-        <h3>Красная зона</h3>
-        <p id="quizQuestion">Вопрос по финансовой грамотности</p>
-        <div class="answers" id="quizAnswers"></div>
-        <div style="margin-top:10px"><button id="quizClose" class="btn ghost">Отмена</button></div>
-    </div>
-</div>
+/* HUD */
+.hud {
+  display: flex;
+  gap: 10px;
+  padding: 8px 12px;
+  background: linear-gradient(90deg, var(--accent), var(--extra), var(--goal));
+  color: #fff;
+  font-weight: 700;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 14px;
+  height: 50px;
+  flex-shrink: 0;
+}
 
-<div id="redZoneIntroModal" class="modal" aria-hidden="true">
-    <div class="modal-content">
-        <h3>Красная зона</h3>
-        <div class="product-info">
-            <p>Это красная зона! Здесь тебе ты столкнешься с мошенниками!</p>
-            <p>Попав в такую тебе придется выбрать правильную тактику общения с ними, а иначе потеряешь часть ФинГаза и Газики.</p>
-        </div>
-        <div style="margin-top:10px">
-            <button id="redZoneIntroClose" class="btn">Понятно</button>
-        </div>
-    </div>
-</div>
+.hud-item {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
+  backdrop-filter: blur(10px);
+}
 
-<div id="resultModal" class="modal" aria-hidden="true">
-    <div class="modal-content">
-        <h3>Уровень 1 завершён</h3>
-        <p id="resultNote"></p>
-        <div id="bonusInfo"></div>
-        <div style="margin-top:12px">
-            <button id="closeResult" class="btn">ОК</button>
-        </div>
-    </div>
-</div>
+.game-area {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: relative;
+  min-height: 0;
+  overflow: hidden;   /* 🚫 убрали скролл внутри */
+}
 
-<div id="dailyModal" class="modal" aria-hidden="true">
-    <div class="modal-content">
-        <h3>Ежедневные награды</h3>
-        <div class="rewards-grid">
-            <div class="reward-day"><span>День 1</span><br>+10 ⚡</div>
-            <div class="reward-day"><span>День 2</span><br>+20 ₽</div>
-            <div class="reward-day"><span>День 3</span><br>+15 ⚡</div>
-            <div class="reward-day"><span>День 4</span><br>+30 ₽</div>
-            <div class="reward-day"><span>День 5</span><br>+25 ⚡</div>
-            <div class="reward-day"><span>День 6</span><br>+50 ₽</div>
-            <div class="reward-day"><span>День 7</span><br>+100 ⚡ +100 ₽</div>
-        </div>
-        <div style="margin-top:12px; display: flex; gap: 10px; justify-content: center;">
-            <button id="closeDaily" class="btn ghost">На главную</button>
-            <button id="nextLevel" class="btn">Следующий уровень</button>
-        </div>
-    </div>
-</div>
+/* Диалоги */
+.dialog-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
 
-<script src="js/level1.js"></script>
-</body>
-</html>
+.dialog-box-overlay {
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  max-width: 320px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
 
+.character-overlay {
+  text-align: center;
+  margin-bottom: 12px;
+}
 
+.character-overlay .char-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
+  display: block;
+  margin: 0 auto 6px;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.3);
+  padding: 2px;
+}
 
+.character-overlay .char-name {
+  font-weight: 700;
+  color: #ff6600;
+  font-size: 14px;
+}
 
+.dialog-box-overlay p {
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0 0 12px 0;
+  color: #333;
+}
 
+/* Игровое поле */
+.board-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 10px;
+  min-height: 0;
+  background: #bdcefa;
+  overflow: hidden;   /* 🚫 убрали скролл */
+}
 
+#board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  gap: 2px;
+  width: min(90vw, 90vh * 5/7, 350px);
+  height: min(calc(90vw * 7/5), 90vh, 490px);
+  background: #bdcefa;
+  border-radius: 8px;
+  border: 2px solid rgba(0,0,0,0.05);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  padding: 2px;
+  flex-shrink: 0;
+  aspect-ratio: 5/7;
+}
 
+.cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  background: #dee1ee;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  color: var(--accent);
+  user-select: none;
+  position: relative;
+  transition: all 0.2s;
+  aspect-ratio: 1/1;
+}
+
+.cell:hover {
+  transform: scale(1.03);
+  border-color: var(--accent);
+  box-shadow: 0 2px 6px rgba(42, 122, 222, 0.15);
+}
+
+.cell.start {
+  background: linear-gradient(135deg, #e9fff0, #c8ffd9);
+  color: #004d1a;
+  font-weight: 900;
+  box-shadow: 0 4px 12px rgba(26, 184, 100, 0.12);
+  border: 2px solid #4bb;
+}
+
+.cell.goal {
+  background: linear-gradient(135deg, #fff7e9, #ffebc8);
+  color: #6b3b00;
+  font-weight: 900;
+  box-shadow: 0 4px 12px rgba(255, 184, 77, 0.12);
+  border: 2px solid #f93;
+}
+
+/* 🔴 Красные зоны */
+.cell.red-zone {
+  background: linear-gradient(135deg, #ffc4c4, var(--danger)) !important;
+  color: #5d1a1a !important;
+  font-weight: 800;
+  border: 2px solid #ff6b6b !important;
+  box-shadow: 0 2px 8px rgba(224, 70, 70, 0.3) !important;
+  animation: pulse-red 2s infinite;
+}
+
+@keyframes pulse-red {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.cell.red-zone span {
+  display: block;
+  text-align: center;
+  width: 100%;
+}
+
+/* Трубы */
+.cell[data-pipe] { font-weight: 900; }
+
+.cell.flow {
+  background: linear-gradient(135deg, rgba(0,195,255,0.15), rgba(0,195,255,0.08));
+  color: var(--flow);
+  text-shadow: 0 0 8px rgba(0, 195, 255, 0.9);
+  border-color: var(--flow);
+}
+
+.cell.has-pipe {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px;
+}
+
+.cell.has-pipe img.pipe-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.cell.pipe-fixed {
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.04);
+}
+
+/* Панель выбора труб (мобилка) */
+.mobile-pipe-panel {
+  width: 100%;
+  padding: 8px 12px;
+  background: #fff;
+  border-top: 2px solid #e0e0e0;
+  flex-shrink: 0;
+  height: 70px;
+}
+
+.pipe-choice-mobile p {
+  margin: 0 0 8px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+}
+
+.pipe-buttons-mobile {
+  display: flex;
+  gap: 4px;
+  justify-content: space-between;
+}
+
+.pipe-buttons-mobile .btn {
+  flex: 1;
+  min-height: 40px;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  transition: all 0.2s ease;
+}
+
+.pipe-buttons-mobile .btn:hover {
+  background: #e8f4ff;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.pipe-buttons-mobile .btn.active {
+  border: 2px solid var(--accent);
+  background: #d6ecff;
+}
+
+.pipe-buttons-mobile .btn img.pipe-img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* Кнопки */
+.btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 0;
+  background: linear-gradient(90deg, var(--accent), var(--extra), var(--goal));
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s;
+  color: #fff;
+  font-size: 14px;
+}
+
+.btn:hover { transform: scale(1.05); }
+
+.btn.ghost {
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, .06);
+  color: var(--accent);
+}
+
+/* Модалки */
+.modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+  padding: 20px;
+}
+
+.modal[aria-hidden="false"] { display: flex; }
+
+.modal-content {
+  background: #fff;
+  padding: 16px;
+  border-radius: 10px;
+  max-width: 320px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Ответы */
+.answers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.answers button {
+  padding: 12px;
+  border-radius: 8px;
+  border: 0;
+  background: linear-gradient(90deg, var(--accent), var(--extra), var(--goal));
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s;
+  color: #fff;
+  font-size: 14px;
+  width: 100%;
+}
+
+.answers button:hover { transform: scale(1.05); }
+
+/* Tutorial */
+.cell.tutorial {
+  box-shadow: 0 0 0 3px var(--accent);
+  z-index: 10;
+}
+
+/* Мобайл/Десктоп */
+.side-panel { display: none; }
+
+@media (min-width: 769px) {
+  .mobile-pipe-panel { display: none; }
+  .side-panel { display: block; }
+  .game-area {
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 12px;
+  }
+}
+
+/* Адаптивы */
+@supports (-webkit-touch-callout: none) {
+  .game-area { height: -webkit-fill-available; }
+}
+
+.cell {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+@media (max-width: 768px) {
+  body { touch-action: pan-x pan-y; }
+}
+
+@media (max-height: 700px) {
+  .board-container { padding: 5px; }
+  #board {
+    width: min(85vw, 85vh * 5/7, 320px);
+    height: min(calc(85vw * 7/5), 85vh, 450px);
+  }
+  .mobile-pipe-panel { padding: 6px 10px; height: 60px; }
+  .pipe-buttons-mobile .btn { min-height: 35px; }
+  .cell { font-size: 14px; }
+}
+
+@media (max-height: 600px) {
+  #board {
+    width: min(80vw, 80vh * 5/7, 300px);
+    height: min(calc(80vw * 7/5), 80vh, 420px);
+  }
+  .mobile-pipe-panel { height: 55px; }
+  .pipe-buttons-mobile .btn { min-height: 32px; }
+  .pipe-buttons-mobile .btn img.pipe-img { width: 18px; height: 18px; }
+  .cell { font-size: 13px; }
+}
+
+@media (max-height: 500px) {
+  #board {
+    width: min(75vw, 75vh * 5/7, 280px);
+    height: min(calc(75vw * 7/5), 75vh, 390px);
+    gap: 1px;
+    padding: 1px;
+  }
+  .mobile-pipe-panel { height: 50px; padding: 4px 8px; }
+  .pipe-buttons-mobile { gap: 2px; }
+  .cell { font-size: 12px; }
+}
+
+@media (min-height: 800px) {
+  .board-container { overflow: hidden; }
+}
