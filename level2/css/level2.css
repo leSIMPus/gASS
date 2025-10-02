@@ -18,13 +18,16 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
 }
 
 body {
   font-family: Inter, Arial, sans-serif;
   background: linear-gradient(180deg, var(--bg1), var(--bg2));
   color: #0e2b36;
+  /* Разрешаем скроллинг только когда нужно */
+  overflow-y: auto;
+  /* Минимальная высота - весь экран */
+  min-height: 100vh;
 }
 
 .hud {
@@ -38,6 +41,10 @@ body {
   flex-wrap: wrap;
   font-size: 14px;
   height: 50px;
+  /* Фиксируем HUD вверху */
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .hud-item {
@@ -51,7 +58,8 @@ body {
 .game-area {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 50px);
+  /* Изменяем высоту на автоматическую */
+  min-height: calc(100vh - 50px);
   position: relative;
 }
 
@@ -258,7 +266,12 @@ body {
   background: #fff;
   border-top: 2px solid #e0e0e0;
   flex-shrink: 0;
-  height: 70px;
+  height: auto; /* Меняем фиксированную высоту на авто */
+  min-height: 70px;
+  /* Фиксируем панель внизу когда нужно */
+  position: sticky;
+  bottom: 0;
+  z-index: 90;
 }
 
 .pipe-choice-mobile p {
@@ -495,5 +508,30 @@ body {
 @media (max-width: 768px) {
   body {
     touch-action: pan-x pan-y;
+  }
+}
+
+@media (max-height: 700px) {
+  .board-container {
+    padding: 5px;
+  }
+
+  #board {
+    max-height: 400px;
+  }
+
+  .mobile-pipe-panel {
+    padding: 6px 10px;
+  }
+
+  .pipe-buttons-mobile .btn {
+    min-height: 35px;
+  }
+}
+
+/* ДОБАВЛЯЕМ для предотвращения скролла когда все помещается */
+@media (min-height: 800px) {
+  body {
+    overflow-y: hidden;
   }
 }
