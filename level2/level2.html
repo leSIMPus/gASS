@@ -14,25 +14,28 @@
 </header>
 
 <main class="game-area">
-  <!-- Боковая панель с диалогами Финна -->
-  <aside class="side-panel">
-    <div class="character">
-      <div class="char-img">Ф</div>
-      <div class="char-name">Финн</div>
-    </div>
-
-    <div class="dialog-box">
-      <p id="dialogText">Ты прекрасно справился с первым уровнем!</p>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <button id="nextBtn" class="btn">Далее</button>
-        <button id="hintBtn" class="btn ghost" title="Подсказка (платно)">Подсказка</button>
+  <!-- Временное диалоговое окно поверх игрового поля -->
+  <div id="dialogOverlay" class="dialog-overlay">
+    <div class="dialog-box-overlay">
+      <div class="character-overlay">
+        <div class="char-img">Ф</div>
+        <div class="char-name">Финн</div>
       </div>
+      <p id="dialogTextOverlay">Ты прекрасно справился с первым уровнем!</p>
+      <button id="nextBtnOverlay" class="btn">Далее</button>
     </div>
+  </div>
 
-    <!-- Панель выбора трубы для десктопа -->
-    <div id="pipeChoice" class="pipe-choice">
+  <!-- Игровое поле -->
+  <section class="board-container">
+    <div id="board" class="board" aria-label="Игровое поле"></div>
+  </section>
+
+  <!-- Мобильная панель выбора труб -->
+  <div id="mobilePipePanel" class="mobile-pipe-panel">
+    <div class="pipe-choice-mobile">
       <p>Выберите трубу:</p>
-      <div class="pipe-buttons">
+      <div class="pipe-buttons-mobile">
         <button class="btn" data-type="H" onclick="choosePipe('H')">
           <img src="images/H.png" alt="горизонтальная" class="pipe-img">
         </button>
@@ -53,72 +56,10 @@
         </button>
       </div>
     </div>
-  </aside>
-
-  <!-- Основная область с игровым полем и мобильной панелью -->
-  <div class="main-content-area">
-    <!-- Игровое поле -->
-    <section class="board-container">
-      <div id="board" class="board" aria-label="Игровое поле"></div>
-    </section>
-
-    <!-- Мобильная панель выбора труб -->
-    <div id="mobilePipePanel" class="mobile-pipe-panel">
-      <div class="pipe-choice-mobile">
-        <p>Выберите трубу:</p>
-        <div class="pipe-buttons-mobile">
-          <button class="btn" data-type="H" onclick="choosePipe('H')">
-            <img src="images/H.png" alt="горизонтальная" class="pipe-img">
-          </button>
-          <button class="btn" data-type="V" onclick="choosePipe('V')">
-            <img src="images/V.png" alt="вертикальная" class="pipe-img">
-          </button>
-          <button class="btn" data-type="LU" onclick="choosePipe('LU')">
-            <img src="images/LU.png" alt="верх-лево" class="pipe-img">
-          </button>
-          <button class="btn" data-type="UR" onclick="choosePipe('UR')">
-            <img src="images/UR.png" alt="верх-право" class="pipe-img">
-          </button>
-          <button class="btn" data-type="LD" onclick="choosePipe('LD')">
-            <img src="images/LD.png" alt="низ-лево" class="pipe-img">
-          </button>
-          <button class="btn" data-type="RD" onclick="choosePipe('RD')">
-            <img src="images/RD.png" alt="низ-право" class="pipe-img">
-          </button>
-        </div>
-      </div>
-    </div>
   </div>
 </main>
 
-<!-- Мобильная панель выбора труб (ВНЕ основного контента) -->
-<div id="mobilePipePanel" class="mobile-pipe-panel">
-  <div class="pipe-choice-mobile">
-    <p>Выберите трубу:</p>
-    <div class="pipe-buttons-mobile">
-      <button class="btn" data-type="H" onclick="choosePipe('H')">
-        <img src="images/H.png" alt="горизонтальная" class="pipe-img">
-      </button>
-      <button class="btn" data-type="V" onclick="choosePipe('V')">
-        <img src="images/V.png" alt="вертикальная" class="pipe-img">
-      </button>
-      <button class="btn" data-type="LU" onclick="choosePipe('LU')">
-        <img src="images/LU.png" alt="верх-лево" class="pipe-img">
-      </button>
-      <button class="btn" data-type="UR" onclick="choosePipe('UR')">
-        <img src="images/UR.png" alt="верх-право" class="pipe-img">
-      </button>
-      <button class="btn" data-type="LD" onclick="choosePipe('LD')">
-        <img src="images/LD.png" alt="низ-лево" class="pipe-img">
-      </button>
-      <button class="btn" data-type="RD" onclick="choosePipe('RD')">
-        <img src="images/RD.png" alt="низ-право" class="pipe-img">
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Модалка с финансовыми вопросами -->
+<!-- Модальные окна -->
 <div id="quizModal" class="modal" aria-hidden="true">
   <div class="modal-content">
     <h3>Желтая зона</h3>
@@ -128,7 +69,6 @@
   </div>
 </div>
 
-<!-- Модалка с продуктами банка -->
 <div id="productModal" class="modal" aria-hidden="true">
   <div class="modal-content">
     <h3>Продукт банка</h3>
@@ -140,7 +80,6 @@
   </div>
 </div>
 
-<!-- Модалка с объяснением желтых зон -->
 <div id="yellowZoneIntroModal" class="modal" aria-hidden="true">
   <div class="modal-content">
     <h3>Желтая зона</h3>
@@ -155,7 +94,6 @@
   </div>
 </div>
 
-<!-- Модалка с объяснением газиков -->
 <div id="gazikIntroModal" class="modal" aria-hidden="true">
   <div class="modal-content">
     <h3>Газики</h3>
@@ -170,7 +108,6 @@
   </div>
 </div>
 
-<!-- Итог уровня -->
 <div id="resultModal" class="modal" aria-hidden="true">
   <div class="modal-content">
     <h3>Уровень 2 завершён</h3>
@@ -182,9 +119,8 @@
   </div>
 </div>
 
-<!-- Ежедневные награды -->
 <div id="dailyModal" class="modal" aria-hidden="true">
-  <div class="modal-content daily-rewards">
+  <div class="modal-content">
     <h3>Ежедневные награды</h3>
     <div class="rewards-grid">
       <div class="reward-day"><span>День 1</span><br>+10 ⚡</div>
@@ -201,6 +137,10 @@
     </div>
   </div>
 </div>
+
+<script src="js/level2.js"></script>
+</body>
+</html>
 
 <script src="js/level2.js"></script>
 </body>
