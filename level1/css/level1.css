@@ -1,352 +1,126 @@
-:root {
-  --bg1: #f0f8ff;       /* светло-голубой фон */
-  --bg2: #e6f3ff;       /* мягкий голубой */
-  --accent: #2a7ade;    /* фирменный синий */
-  --danger: #e04646;    /* красный для воров */
-  --flow: #00c3ff;      /* голубой поток */
-  --goal: #ff9f1a;      /* оранжевый акцент */
-  --extra: #b388eb;     /* светлый фиолетовый */
-}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>FinGas — Уровень 1</title>
+    <link rel="stylesheet" href="css/level1.css">
+</head>
+<body>
+<header class="hud">
+    <div class="hud-item">Игрок: <span id="playerName">Игрок</span></div>
+    <div class="hud-item">ФинГаз: <span id="finGas">100</span></div>
+    <div class="hud-item">Рублики: <span id="rubles">0</span></div>
+</header>
 
-* {
-  box-sizing: border-box;
-}
+<main class="game-area">
+    <!-- Временное диалоговое окно поверх игрового поля -->
+    <div id="dialogOverlay" class="dialog-overlay">
+        <div class="dialog-box-overlay">
+            <div class="character-overlay">
+                <div class="char-img">Ф</div>
+                <div class="char-name">Финн</div>
+            </div>
+            <p id="dialogTextOverlay">Привет! Я Финн — хранитель знаний о финансах.</p>
+            <button id="nextBtnOverlay" class="btn">Далее</button>
+        </div>
+    </div>
 
-body {
-  margin: 0;
-  font-family: Inter, Arial, sans-serif;
-  background: linear-gradient(180deg, var(--bg1), var(--bg2));
-  color: #0e2b36;
-  min-height: 100vh;
-}
+    <!-- Игровое поле -->
+    <section class="board-container">
+        <div id="board" class="board" aria-label="Игровое поле"></div>
+    </section>
 
-/* HUD */
-.hud {
-  display: flex;
-  gap: 16px;
-  padding: 12px;
-  background: linear-gradient(90deg, var(--accent), var(--extra), var(--goal));
-  color: #fff;
-  font-weight: 700;
-  align-items: center;
-}
+    <!-- Мобильная панель выбора труб -->
+    <div id="mobilePipePanel" class="mobile-pipe-panel">
+        <div class="pipe-choice-mobile">
+            <p>Выберите трубу:</p>
+            <div class="pipe-buttons-mobile">
+                <button class="btn" data-type="H" onclick="choosePipe('H')">
+                    <img src="images/H.png" alt="горизонтальная" class="pipe-img">
+                </button>
+                <button class="btn" data-type="V" onclick="choosePipe('V')">
+                    <img src="images/V.png" alt="вертикальная" class="pipe-img">
+                </button>
+                <button class="btn" data-type="LU" onclick="choosePipe('LU')">
+                    <img src="images/LU.png" alt="верх-лево" class="pipe-img">
+                </button>
+                <button class="btn" data-type="UR" onclick="choosePipe('UR')">
+                    <img src="images/UR.png" alt="верх-право" class="pipe-img">
+                </button>
+                <button class="btn" data-type="LD" onclick="choosePipe('LD')">
+                    <img src="images/LD.png" alt="низ-лево" class="pipe-img">
+                </button>
+                <button class="btn" data-type="RD" onclick="choosePipe('RD')">
+                    <img src="images/RD.png" alt="низ-право" class="pipe-img">
+                </button>
+            </div>
+        </div>
+    </div>
+</main>
 
-/* Основная область */
-.game-area {
-  display: flex;
-  gap: 10px; /* расстояние между панелью и полем */
-  align-items: flex-start;
-  justify-content: center; /* чтобы оба блока были в центре */
-  padding: 12px;
-}
+<!-- Модальные окна -->
+<div id="quizModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+        <h3>Красная зона</h3>
+        <p id="quizQuestion">Вопрос по финансовой грамотности</p>
+        <div class="answers" id="quizAnswers"></div>
+        <div style="margin-top:10px"><button id="quizClose" class="btn ghost">Отмена</button></div>
+    </div>
+</div>
 
-.side-panel {
-  width: 260px; /* фикс ширина */
-  background: #fff;
-  padding: 12px;
-  border-radius: 10px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, .06);
-  margin: 0;
-}
+<div id="redZoneIntroModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+        <h3>Красная зона</h3>
+        <div class="product-info">
+            <p>Это красная зона! Здесь тебе ты столкнешься с мошенниками!</p>
+            <p>Попав в такую тебе придется выбрать правильную тактику общения с ними, а иначе потеряешь часть ФинГаза и Газики.</p>
+        </div>
+        <div style="margin-top:10px">
+            <button id="redZoneIntroClose" class="btn">Понятно</button>
+        </div>
+    </div>
+</div>
 
-#board {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);  /* 5 колонок */
-  grid-template-rows: repeat(8, 1fr);     /* 8 рядов */
-  gap: 2px;                               /* небольшой зазор между клетками */
-  padding: 0;
-  width: 95vw;                             /* почти вся ширина экрана */
-  max-width: 500px;                        /* максимум для больших экранов */
-  aspect-ratio: 5 / 8;                      /* сохраняем пропорцию клеток */
-  background: #e9f7ff;
-  border-radius: 12px;
-  border: 2px solid rgba(0,0,0,0.05);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-  margin: 0 auto;                           /* центрируем */
-}
+<div id="resultModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+        <h3>Уровень 1 завершён</h3>
+        <p id="resultNote"></p>
+        <div id="bonusInfo"></div>
+        <div style="margin-top:12px">
+            <button id="closeResult" class="btn">ОК</button>
+        </div>
+    </div>
+</div>
 
-/* Адаптив для телефонов */
-@media (max-width: 768px) {
-  #board {
-    width: calc(100vw - 40px);   /* уменьшаем отступы */
-    height: calc(100vw - 40px);  /* квадрат */
-  }
+<div id="dailyModal" class="modal" aria-hidden="true">
+    <div class="modal-content">
+        <h3>Ежедневные награды</h3>
+        <div class="rewards-grid">
+            <div class="reward-day"><span>День 1</span><br>+10 ⚡</div>
+            <div class="reward-day"><span>День 2</span><br>+20 ₽</div>
+            <div class="reward-day"><span>День 3</span><br>+15 ⚡</div>
+            <div class="reward-day"><span>День 4</span><br>+30 ₽</div>
+            <div class="reward-day"><span>День 5</span><br>+25 ⚡</div>
+            <div class="reward-day"><span>День 6</span><br>+50 ₽</div>
+            <div class="reward-day"><span>День 7</span><br>+100 ⚡ +100 ₽</div>
+        </div>
+        <div style="margin-top:12px; display: flex; gap: 10px; justify-content: center;">
+            <button id="closeDaily" class="btn ghost">На главную</button>
+            <button id="nextLevel" class="btn">Следующий уровень</button>
+        </div>
+    </div>
+</div>
 
-  .game-area {
-    flex-direction: column; /* панель сверху, поле ниже */
-    align-items: center;
-  }
-
-  .side-panel {
-    width: 100%;
-    max-width: 380px;
-  }
-}
-
-
-
-
-.char-img {
-  width: 76px;
-  height: 76px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--accent), var(--extra));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  color: #fff;
-  margin-bottom: 6px;
-}
-
-.dialog-box p {
-  font-size: 14px;
-  line-height: 1.4;
-}
-
-/* Кнопки */
-.btn {
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 0;
-  background: linear-gradient(90deg, var(--accent), var(--extra), var(--goal));
-  font-weight: 800;
-  cursor: pointer;
-  transition: transform 0.15s;
-  color: #fff;
-}
-
-.btn:hover {
-  transform: scale(1.05);
-}
-
-.btn.ghost {
-  background: transparent;
-  border: 1px solid rgba(0, 0, 0, .06);
-  color: var(--accent);
-}
-
-/* Игровое поле */
-.board-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
+<script src="js/level1.js"></script>
+</body>
+</html>
 
 
-.cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 0;
-  color: var(--accent);
-  user-select: none;
-  position: relative;
-  transition: background 0.2s, transform 0.1s;
-  aspect-ratio: 1 / 1;
-}
-
-.cell .pipe-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.cell:hover {
-  transform: scale(1.05);
-}
-
-.cell.start {
-  background: linear-gradient(180deg, #e9fff0, #c8ffd9);
-  color: #004d1a;
-  font-weight: 900;
-  box-shadow: 0 6px 20px rgba(26, 184, 100, 0.12);
-}
-
-.cell.goal {
-  background: linear-gradient(180deg, #fff7e9, #ffebc8);
-  color: #6b3b00;
-  font-weight: 900;
-  box-shadow: 0 6px 20px rgba(255, 184, 77, 0.12);
-}
-
-.cell.thief {
-  background: linear-gradient(180deg, #ffcccc, var(--danger));
-  color: #4a0000;
-  font-weight: 800;
-  border: 1px solid #b32a2a;
-  box-shadow: 0 4px 10px rgba(224, 70, 70, 0.25);
-}
-
-.cell[data-pipe] {
-  font-weight: 900;
-}
-
-/* Подсветка потока */
-.cell.flow {
-  color: var(--flow);
-  text-shadow: 0 0 10px rgba(0, 195, 255, 0.9);
-}
-
-/* Анимация Газпи */
-.gazpi {
-  position: absolute;
-  pointer-events: none;
-  font-weight: 800;
-  color: gold;
-  font-size: 20px;
-  transform: translateY(0);
-  transition: transform .9s ease, opacity .9s ease;
-}
-
-.gazpi.hidden {
-  opacity: 0;
-  transform: translateY(0);
-}
-
-/* Модальные окна */
-.modal {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.45);
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity .15s;
-}
-
-.modal[aria-hidden="false"] {
-  visibility: visible;
-  opacity: 1;
-}
-
-.modal-content {
-  background: #fff;
-  padding: 16px;
-  border-radius: 10px;
-  max-width: 420px;
-  text-align: center;
-}
-
-.answers {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.answers button {
-  padding: 8px;
-  border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, .06);
-  cursor: pointer;
-}
-
-/* Панель выбора трубы */
-#pipeChoice {
-  margin-top: 16px;
-  padding: 10px;
-  border: 2px solid #ddd;
-  border-radius: 12px;
-  background: #fdfdfd;
-  text-align: center;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-}
-
-#pipeChoice p {
-  margin: 0 0 8px;
-  font-weight: 600;
-  font-size: 14px;
-  color: #333;
-}
-
-.pipe-buttons button {
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.pipe-buttons img.pipe-img {
-  width: 30px;   /* размер картинки в кнопке */
-  height: 30px;
-  object-fit: contain;
-  pointer-events: none; /* чтобы клики проходили на кнопку */
-}
 
 
-#pipeChoice .btn {
-  margin: 3px;
-  padding: 6px 10px;
-  font-size: 22px;
-  cursor: pointer;
-  border: 2px solid #aaa;
-  border-radius: 6px;
-  background: #fff;
-  transition: 0.2s;
-  color: var(--accent);
-}
 
-#pipeChoice .btn:hover {
-  background: #e0f2ff;
-}
 
-#pipeChoice .btn.active {
-  outline: 3px solid var(--accent);
-  background: #d6ecff;
-  color: #0e2b36;
-}
-.hud-item {
-  background: rgba(255, 255, 255, 0.15);
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 14px;
-  flex: 0 0 auto; /* чтобы не растягивалось */
-}
-.cell.pipe {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px; /* пока символы */
-}
-
-.pipe-sym {
-  pointer-events: none;
-}
-
-.cell.start {
-  background: #d0f0ff; /* нежно-голубая подложка */
-  border: 2px solid #4bb;
-}
-
-.cell.goal {
-  background: #ffe6cc; /* тёплый оттенок */
-  border: 2px solid #f93;
-}
-.cell.has-pipe .pipe-sym {
-  font-size: 28px;
-  font-weight: 900;
-  color: var(--accent);
-  line-height: 1;
-}
-
-.cell.flow {
-  background: linear-gradient(180deg, rgba(0,195,255,0.12), rgba(0,195,255,0.06));
-  box-shadow: 0 6px 18px rgba(0,195,255,0.08);
-  color: var(--flow);
-}
-
-.cell.pipe-fixed {
-  box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), 0 6px 18px rgba(0,0,0,0.04);
-}
-
-.modal { display: none; align-items: center; justify-content: center; }
-.modal[aria-hidden="false"] { display: flex; }
 
