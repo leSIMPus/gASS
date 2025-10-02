@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FinGas — Уровень 2</title>
+  <style>
+    :root {
+      --bg1: #f0f8ff;
+      --bg2: #e6f3ff;
+      --accent: #2a7ade;
+      --danger: #e04646;
+      --warning: #ffa726;
+      --flow: #00c3ff;
+      --goal: #ff9f1a;
+      --extra: #b388eb;
+      --gazik: #4caf50;
+      --white-zone: #f8f9fa;
+      --red-zone: #dc3545;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    body {
+      font-family: Inter, Arial, sans-serif;
+      background: linear-gradient(180deg, var(--bg1), var(--bg2));
+      color: #0e2b36;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hud {
+      display: flex;
+      gap: 10px;
+      padding: 8px 12px;
+      background: linear-gradient(90deg, var(--accent), var(--extra), var(--goal));
+      color: #fff;
+      font-weight: 700;
+      align-items: center;
+      flex-wrap: wrap;
+      font-size: 14px;
+      height: 50px;
+      flex-shrink: 0;
+    }
+
+    .hud-item {
+      background: rgba(255, 255, 255, 0.2);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      backdrop-filter: blur(10px);
+    }
+
+    .game-area {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      position: relative;
+      min-height: 0;
+    }
+
+    /* Боковая панель для десктопа */
+    .side-panel {
+      display: none;
+      width: 280px;
+      background: #fff;
+      padding: 16px;
+      border-radius: 12px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+      margin: 0;
+    }
+
+    .character {
+      text-align: center;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .char-img {
+      width: 76px;
+      height: 76px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--extra));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      color: #fff;
+      margin: 0 auto 6px;
+    }
+
+    .char-name {
+      font-weight: 700;
+      color: var(--accent);
+      margin-top: 4px;
+    }
+
+    .dialog-box {
+      background: #f8fbff;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      border-left: 4px solid var(--warning);
+    }
+
+    .dialog-box p {
+      font-size: 14px;
+      line-height: 1.5;
+      margin: 0 0 12px 0;
+      color: #333;
+    }
+
+    /* Игровое поле */
+    .board-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 10px;
+      min-height: 0;
+      overflow: auto;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      grid-template-rows: repeat(7, 1fr);
+      gap: 2px;
+      width: min(90vw, 90vh * 5/7, 350px);
+      height: min(calc(90vw * 7/5), 90vh, 490px);
+      background: #bdcefa;
+      border-radius: 8px;
+      border: 2px solid rgba(0,0,0,0.05);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      padding: 2px;
+      flex-shrink: 0;
+      aspect-ratio: 5/7;
+    }
+
+    .cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      background: #dee1ee;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 4px;
+      color: var(--accent);
+      user-select: none;
+      position: relative;
+      transition: all 0.2s;
+      aspect-ratio: 1/1;
+    }
+
+    .cell:hover {
+      transform: scale(1.03);
+      border-color: var(--accent);
+      box-shadow: 0 2px 6px rgba(42, 122, 222, 0.15);
+    }
+
+    .cell.start {
+      background: linear-gradient(135deg, #e9fff0, #c8ffd9);
+      color: #004d1a;
+      font-weight: 900;
+      box-shadow: 0 4px 12px rgba(26, 184, 100, 0.12);
+      border: 2px solid #4bb;
+    }
+
+    .cell.goal {
+      background: linear-gradient(135deg, #fff7e9, #ffebc8);
+      color: #6b3b00;
+      font-weight: 900;
+      box-shadow: 0 4px 12px rgba(255, 184, 77, 0.12);
+      border: 2px solid #f93;
+    }
+
+    /* Желтые зоны */
+    .cell.yellow-zone {
+      background: linear-gradient(135deg, #fff9c4, var(--warning)) !important;
+      color: #5d4037 !important;
+      font-weight: 800;
+      border: 2px solid #ffb74d !important;
+      box-shadow: 0 2px 8px rgba(255, 167, 38, 0.25) !important;
+      animation: pulse-yellow 2s infinite;
+    }
+
+    /* Белые зоны */
+    .cell.white-zone {
+      background: linear-gradient(135deg, var(--white-zone), #e9ecef) !important;
+      color: #495057 !important;
+      font-weight: 800;
+      border: 2px dashed #6c757d !important;
+      box-shadow: 0 2px 8px rgba(108, 117, 125, 0.2) !important;
+      animation: pulse-white 2s infinite;
+    }
+
+    /* Красные зоны */
+    .cell.red-zone {
+      background: linear-gradient(135deg, var(--red-zone), #c82333) !important;
+      color: white !important;
+      font-weight: 800;
+      border: 2px solid #a71e2a !important;
+      box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3) !important;
+      animation: pulse-red 1.5s infinite;
+    }
+
+    @keyframes pulse-yellow {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+    }
+
+    @keyframes pulse-white {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(108, 117, 125, 0.2);
+      }
+      50% {
+        transform: scale(1.03);
+        box-shadow: 0 2px 12px rgba(108, 117, 125, 0.4);
+      }
+    }
+
+    @keyframes pulse-red {
+      0%, 100% {
+        transform: scale(1);
+        box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+      }
+      50% {
+        transform: scale(1.05);
+        box-shadow: 0 2px 15px rgba(220, 53, 69, 0.5);
+      }
+    }
+
+    .cell.gazik {
+      background: #fff;
+      color: #2a7ade;
+      font-weight: 800;
+      border: 2px solid #e8f4ff;
+      box-shadow: 0 2px 6px rgba(42, 122, 222, 0.15);
+      animation: fire-flicker 1.5s infinite alternate;
+      position: relative;
+      filter: hue-rotate(180deg) saturate(2);
+    }
+
+    @keyframes fire-flicker {
+      0%, 100% { transform: scale(1); color: #2a7ade; }
+      25% { transform: scale(1.05); color: #00c3ff; }
+      50% { transform: scale(0.98); color: #1a5fb4; }
+      75% { transform: scale(1.03); color: #4d9fff; }
+    }
+
+    .cell[data-pipe] {
+      font-weight: 900;
+    }
+
+    .cell.flow {
+      background: linear-gradient(135deg, rgba(0,195,255,0.15), rgba(0,195,255,0.08));
+      color: var(--flow);
+      text-shadow: 0 0 8px rgba(0, 195, 255, 0.9);
+      border-color: var(--flow);
+    }
+
+    .cell.has-pipe {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1px;
+    }
+
+    .cell.has-pipe img.pipe-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    .cell.pipe-fixed {
+      box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.04);
+    }
+
+    /* Мобильная панель выбора труб */
+    .mobile-pipe-panel {
+      width: 100%;
+      padding: 8px 12px;
+      background: #fff;
+      border-top: 2px solid #e0e0e0;
+      flex-shrink: 0;
+      height: 70px;
+    }
+
+    .pipe-choice-mobile p {
+      margin: 0 0 8px;
+      font-weight: 600;
+      font-size: 14px;
+      color: #333;
+      text-align: center;
+    }
+
+    .pipe-buttons-mobile {
+      display: flex;
+      gap: 4px;
+      justify-content: space-between;
+    }
+
+    .pipe-buttons-mobile .btn {
+      flex: 1;
+      min-height: 40px;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #ccc;
+      border-radius: 6px;
+      background: #fff;
+      transition: all 0.2s ease;
+    }
+
+    .pipe-buttons-mobile .btn:hover {
+      background: #e8f4ff;
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .pipe-buttons-mobile .btn.active {
+      border: 2px solid var(--accent);
+      background: #d6ecff;
+    }
+
+    .pipe-buttons-mobile .btn img.pipe-img {
+      width: 20px;
+      height: 20px;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    /* Кнопки */
+    .btn {
+      padding: 8px 12px;
+      border-radius: 8px;
+      border: 0;
+      background: linear-gradient(90deg, var(--accent), var(--extra), var(--goal));
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.15s;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    .btn.ghost {
+      background: transparent;
+      border: 1px solid rgba(0, 0, 0, .06);
+      color: var(--accent);
+    }
+
+    /* Модальные окна */
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.45);
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal[aria-hidden="false"] {
+      display: flex;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 16px;
+      border-radius: 10px;
+      max-width: 320px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .answers {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .answers button {
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(0, 0, 0, .06);
+      cursor: pointer;
+      background: #f5f5f5;
+      transition: all 0.2s;
+      font-size: 14px;
+      color: #333;
+      width: 100%;
+    }
+
+    .answers button:hover {
+      background: #e8f4ff;
+      border-color: var(--accent);
+    }
+
+    .product-info {
+      text-align: left;
+      margin: 12px 0;
+      padding: 12px;
+      background: #f9f9f9;
+      border-radius: 8px;
+    }
+
+    .product-info h4 {
+      margin: 0 0 8px 0;
+      color: var(--accent);
+    }
+
+    .product-info p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .rewards-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .reward-day {
+      padding: 8px;
+      background: #f5f5f5;
+      border-radius: 6px;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    .reward-day span {
+      font-weight: bold;
+    }
+
+    .bonus-item {
+      margin: 8px 0;
+      padding: 6px;
+      background: #f0f8f0;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    /* Анимации для специальных эффектов */
+    .gazik-floating {
+      color: #2a7ade !important;
+      text-shadow: 0 0 8px rgba(42, 122, 222, 0.7);
+      animation: float-text 1s ease-in-out;
+    }
+
+    .white-zone-floating {
+      color: #6c757d !important;
+      text-shadow: 0 0 8px rgba(108, 117, 125, 0.7);
+      animation: float-text 1s ease-in-out;
+    }
+
+    .red-zone-floating {
+      color: #dc3545 !important;
+      text-shadow: 0 0 8px rgba(220, 53, 69, 0.7);
+      animation: float-text 1s ease-in-out;
+    }
+
+    @keyframes float-text {
+      0% {
+        transform: translateY(0) scale(0.8);
+        opacity: 0.7;
+      }
+      100% {
+        transform: translateY(-70px) scale(1);
+        opacity: 0;
+      }
+    }
+
+    /* Стиль для tutorial подсветки */
+    .cell.tutorial {
+      box-shadow: 0 0 0 3px var(--accent);
+      z-index: 10;
+    }
+
+    /* Десктопная версия */
+    @media (min-width: 769px) {
+      .mobile-pipe-panel {
+        display: none;
+      }
+
+      .side-panel {
+        display: block;
+      }
+
+      .game-area {
+        flex-direction: row;
+        align-items: flex-start;
+        padding: 12px;
+      }
+    }
+
+    /* Адаптация для маленьких экранов */
+    @media (max-height: 700px) {
+      .board-container {
+        padding: 5px;
+      }
+
+      #board {
+        width: min(85vw, 85vh * 5/7, 320px);
+        height: min(calc(85vw * 7/5), 85vh, 450px);
+      }
+
+      .mobile-pipe-panel {
+        padding: 6px 10px;
+        height: 60px;
+      }
+
+      .pipe-buttons-mobile .btn {
+        min-height: 35px;
+      }
+
+      .pipe-choice-mobile p {
+        margin: 0 0 4px;
+        font-size: 13px;
+      }
+
+      .cell {
+        font-size: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+<header class="hud">
+  <div class="hud-item">Игрок: <span id="playerName">Игрок</span></div>
+  <div class="hud-item">ФинГаз: <span id="finGas">100</span></div>
+  <div class="hud-item">Рублики: <span id="rubles">0</span></div>
+</header>
+
+<main class="game-area">
+  <!-- Боковая панель для десктопа -->
+  <aside class="side-panel">
+    <div class="character">
+      <div class="char-img">Ф</div>
+      <div class="char-name">Финн</div>
+    </div>
+
+    <div class="dialog-box">
+      <p id="dialogText">Ты прекрасно справился с первым уровнем!</p>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button id="nextBtn" class="btn">Далее</button>
+        <button id="hintBtn" class="btn ghost" title="Подсказка (платно)">Подсказка</button>
+      </div>
+    </div>
+
+    <!-- Панель выбора трубы -->
+    <div id="pipeChoice" class="pipe-choice">
+      <p>Выберите трубу:</p>
+      <div class="pipe-buttons">
+        <button class="btn" data-type="H" onclick="choosePipe('H')">━</button>
+        <button class="btn" data-type="V" onclick="choosePipe('V')">┃</button>
+        <button class="btn" data-type="LU" onclick="choosePipe('LU')">┘</button>
+        <button class="btn" data-type="UR" onclick="choosePipe('UR')">└</button>
+        <button class="btn" data-type="LD" onclick="choosePipe('LD')">┐</button>
+        <button class="btn" data-type="RD" onclick="choosePipe('RD')">┌</button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Игровое поле -->
+  <section class="board-container">
+    <div id="board" class="board" aria-label="Игровое поле"></div>
+  </section>
+
+  <!-- Мобильная панель выбора труб -->
+  <div class="mobile-pipe-panel">
+    <div class="pipe-choice-mobile">
+      <p>Выберите трубу:</p>
+      <div class="pipe-buttons-mobile">
+        <button class="btn" data-type="H" onclick="choosePipe('H')">━</button>
+        <button class="btn" data-type="V" onclick="choosePipe('V')">┃</button>
+        <button class="btn" data-type="LU" onclick="choosePipe('LU')">┘</button>
+        <button class="btn" data-type="UR" onclick="choosePipe('UR')">└</button>
+        <button class="btn" data-type="LD" onclick="choosePipe('LD')">┐</button>
+        <button class="btn" data-type="RD" onclick="choosePipe('RD')">┌</button>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Модалки для разных типов зон -->
+<div id="quizModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <h3>Желтая зона</h3>
+    <p id="quizQuestion">Вопрос по финансовой грамотности</p>
+    <div class="answers" id="quizAnswers"></div>
+    <div style="margin-top:10px"><button id="quizClose" class="btn ghost">Отмена</button></div>
+  </div>
+</div>
+
+<div id="whiteZoneModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <h3>Белая зона</h3>
+    <p id="whiteZoneQuestion">Вопрос средней сложности</p>
+    <div class="answers" id="whiteZoneAnswers"></div>
+    <div style="margin-top:10px"><button id="whiteZoneClose" class="btn ghost">Отмена</button></div>
+  </div>
+</div>
+
+<div id="redZoneModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <h3>Красная зона</h3>
+    <p id="redZoneQuestion">Сложный вопрос</p>
+    <div class="answers" id="redZoneAnswers"></div>
+    <div style="margin-top:10px"><button id="redZoneClose" class="btn ghost">Отмена</button></div>
+  </div>
+</div>
+
+<div id="productModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <h3>Продукт банка</h3>
+    <p id="productText">Ознакомьтесь с продуктом банка</p>
+    <div class="product-info" id="productInfo"></div>
+    <div style="margin-top:10px">
+      <button id="productClose" class="btn">Понятно</button>
+    </div>
+  </div>
+</div>
+
+<div id="resultModal" class="modal" aria-hidden="true">
+  <div class="modal-content">
+    <h3>Уровень 2 завершён</h3>
+    <p id="resultNote"></p>
+    <div id="bonusInfo"></div>
+    <div style="margin-top:12px">
+      <button id="closeResult" class="btn">ОК</button>
+    </div>
+  </div>
+</div>
+
+<div id="dailyModal" class="modal" aria-hidden="true">
+  <div class="modal-content daily-rewards">
+    <h3>Ежедневные награды</h3>
+    <div class="rewards-grid">
+      <div class="reward-day"><span>День 1</span><br>+10 ⚡</div>
+      <div class="reward-day"><span>День 2</span><br>+20 ₽</div>
+      <div class="reward-day"><span>День 3</span><br>+15 ⚡</div>
+      <div class="reward-day"><span>День 4</span><br>+30 ₽</div>
+      <div class="reward-day"><span>День 5</span><br>+25 ⚡</div>
+      <div class="reward-day"><span>День 6</span><br>+50 ₽</div>
+      <div class="reward-day"><span>День 7</span><br>+100 ⚡ +100 ₽</div>
+    </div>
+    <div style="margin-top:12px; display: flex; gap: 10px; justify-content: center;">
+      <button id="closeDaily" class="btn ghost">На главную</button>
+      <button id="nextLevel" class="btn">Следующий уровень</button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // DOM элементы
+  const boardEl = document.getElementById('board');
+  const dialogText = document.getElementById('dialogText');
+  const nextBtn = document.getElementById('nextBtn');
+  const rublesEl = document.getElementById('rubles');
+  const finGasEl = document.getElementById('finGas');
+
+  // Модалки для разных типов зон
+  const quizModal = document.getElementById('quizModal');
+  const quizAnswers = document.getElementById('quizAnswers');
+  const quizClose = document.getElementById('quizClose');
+
+  const whiteZoneModal = document.getElementById('whiteZoneModal');
+  const whiteZoneAnswers = document.getElementById('whiteZoneAnswers');
+  const whiteZoneClose = document.getElementById('whiteZoneClose');
+
+  const redZoneModal = document.getElementById('redZoneModal');
+  const redZoneAnswers = document.getElementById('redZoneAnswers');
+  const redZoneClose = document.getElementById('redZoneClose');
+
+  const productModal = document.getElementById('productModal');
+  const productClose = document.getElementById('productClose');
+  const productInfo = document.getElementById('productInfo');
+
+  const resultModal = document.getElementById('resultModal');
+  const resultNote = document.getElementById('resultNote');
+  const bonusInfo = document.getElementById('bonusInfo');
+  const closeResult = document.getElementById('closeResult');
+
+  const dailyModal = document.getElementById('dailyModal');
+  const closeDaily = document.getElementById('closeDaily');
+  const nextLevelBtn = document.getElementById('nextLevel');
+
+  const playerNameEl = document.getElementById('playerName');
+
+  // состояние игры
+  const rows = 7, cols = 5;
+  let grid = [];
+  let selectedPipeType = null;
+  let rubles = Number(localStorage.getItem('fg_rub')) || 0;
+  let finGas = Number(localStorage.getItem('fg_gas')) || 100;
+  let dialogIdx = 0;
+  let pipesUsed = 0;
+  let correctAnswers = 0;
+  let gaziksCollected = 0;
+  let usedQuestions = new Set();
+  let usedWhiteQuestions = new Set();
+  let usedRedQuestions = new Set();
+
+  // направления и типы труб
+  const DIRS = {
+    t: [-1, 0], r: [0, 1], b: [1, 0], l: [0, -1]
+  };
+  const OPP = { t: 'b', b: 't', l: 'r', r: 'l' };
+  const DIR_KEYS = Object.keys(DIRS);
+
+  const TYPE_DEFS = {
+    H:  { sym: "━", dirs: ["l", "r"] },
+    V:  { sym: "┃", dirs: ["t", "b"] },
+    LD: { sym: "┐", dirs: ["l", "b"] },
+    RD: { sym: "┌", dirs: ["r", "b"] },
+    LU: { sym: "┘", dirs: ["l", "t"] },
+    UR: { sym: "└", dirs: ["r", "t"] }
+  };
+
+  // Вопросы для разных типов зон
+  const YELLOW_QUESTIONS = [
+    {
+      q: "Что лучше: тратить все деньги сразу или откладывать часть?",
+      answers: [
+        { text: "Откладывать 10-20% от дохода", correct: true },
+        { text: "Тратить все, жизнь одна", correct: false },
+        { text: "Брать кредиты на все покупки", correct: false }
+      ]
+    },
+    {
+      q: "Какой минимальный размер 'финансовой подушки'?",
+      answers: [
+        { text: "3-6 месячных доходов", correct: true },
+        { text: "1 месячный доход", correct: false },
+        { text: "Достаточно 10 000 рублей", correct: false }
+      ]
+    }
+  ];
+
+  const WHITE_QUESTIONS = [
+    {
+      q: "Что такое диверсификация инвестиционного портфеля?",
+      answers: [
+        { text: "Распределение инвестиций по разным активам для снижения рисков", correct: true },
+        { text: "Вложение всех средств в один надежный актив", correct: false },
+        { text: "Продажа всех активов при первых признаках падения рынка", correct: false }
+      ]
+    },
+    {
+      q: "Что такое капитализация процентов?",
+      answers: [
+        { text: "Причисление начисленных процентов к основной сумме вклада", correct: true },
+        { text: "Увеличение суммы кредита за счет процентов", correct: false },
+        { text: "Процесс увеличения капитала компании", correct: false }
+      ]
+    }
+  ];
+
+  const RED_QUESTIONS = [
+    {
+      q: "Что показывает коэффициент P/E (Price/Earnings)?",
+      answers: [
+        { text: "Соотношение цены акции к прибыли на акцию", correct: true },
+        { text: "Соотношение долга компании к ее капиталу", correct: false },
+        { text: "Рентабельность компании", correct: false }
+      ]
+    },
+    {
+      q: "Что такое сложный процент (компаундинг)?",
+      answers: [
+        { text: "Начисление процентов на проценты", correct: true },
+        { text: "Простая сумма процентов за весь период", correct: false },
+        { text: "Фиксированная процентная ставка", correct: false }
+      ]
+    }
+  ];
+
+  // Продукты банка для газиков
+  const BANK_PRODUCTS = [
+    {
+      name: "Накопительный счет",
+      description: "До 8% годовых на остаток, пополнение и снятие в любой момент"
+    },
+    {
+      name: "Инвестиции",
+      description: "Покупка акций и облигаций с доходностью выше вклада"
+    }
+  ];
+
+  // Вспомогательные функции
+  function getPipeDirsFromType(type) {
+    if (!type) return [];
+    const def = TYPE_DEFS[type];
+    return def ? def.dirs : [];
+  }
+
+  function getPipeDirsFromCell(cell) {
+    if (!cell) return [];
+    return getPipeDirsFromType(cell.dataset.pipe);
+  }
+
+  function renderPipe(cell, type, opts = {}) {
+      if (!TYPE_DEFS[type]) return;
+      cell.dataset.pipe = type;
+      cell.classList.add('has-pipe');
+      cell.textContent = TYPE_DEFS[type].sym;
+  }
+
+  function getCell(r, c) {
+    if (r < 0 || r >= rows || c < 0 || c >= cols) return null;
+    return grid[r][c];
+  }
+
+  // Создание игрового поля
+  function initBoard() {
+    boardEl.innerHTML = '';
+    grid = [];
+    boardEl.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    boardEl.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+    for (let r = 0; r < rows; r++) {
+      const row = [];
+      for (let c = 0; c < cols; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.dataset.r = r;
+        cell.dataset.c = c;
+        cell.addEventListener('click', () => onCellClick(r, c));
+        boardEl.appendChild(cell);
+        row.push(cell);
+      }
+      grid.push(row);
+    }
+
+    // Старт и финиш
+    const start = getCell(6, 0);
+    start.classList.add('start');
+    renderPipe(start, 'H');
+
+    const goal = getCell(0, 4);
+    goal.classList.add('goal');
+    renderPipe(goal, 'V');
+
+    // Размещение специальных зон
+    placeSpecialZones();
+
+    // Обновление интерфейса
+    updateHUD();
+  }
+
+  // Размещение специальных зон
+  function placeSpecialZones() {
+    // Желтые зоны
+    const yellowPositions = [[5, 1], [4, 3], [3, 2]];
+    yellowPositions.forEach(([r, c]) => {
+      const cell = getCell(r, c);
+      if (cell) {
+        cell.classList.add('yellow-zone');
+        cell.textContent = '?';
+      }
+    });
+
+    // Белые зоны
+    const whitePositions = [[4, 1], [2, 0]];
+    whitePositions.forEach(([r, c]) => {
+      const cell = getCell(r, c);
+      if (cell) {
+        cell.classList.add('white-zone');
+        cell.textContent = '?';
+      }
+    });
+
+    // Красные зоны
+    const redPositions = [[1, 3]];
+    redPositions.forEach(([r, c]) => {
+      const cell = getCell(r, c);
+      if (cell) {
+        cell.classList.add('red-zone');
+        cell.textContent = '?';
+      }
+    });
+
+    // Газики
+    const gazikPositions = [[5, 2], [3, 1], [1, 1]];
+    gazikPositions.forEach(([r, c]) => {
+      const cell = getCell(r, c);
+      if (cell) {
+        cell.classList.add('gazik');
+        cell.textContent = '🔥';
+      }
+    });
+  }
+
+  // Выбор трубы
+  window.choosePipe = function(type) {
+    selectedPipeType = type;
+    document.querySelectorAll(".btn[data-type]").forEach(btn => {
+      btn.classList.remove("active");
+      if (btn.dataset.type === type) {
+        btn.classList.add("active");
+      }
+    });
+  };
+
+  // Проверка возможности установки трубы
+  function canPlacePipe(r, c, type) {
+    if (!TYPE_DEFS[type]) return false;
+    const dirs = getPipeDirsFromType(type);
+
+    const targetCell = getCell(r, c);
+    if (targetCell && targetCell.dataset.pipe) return false;
+
+    // Упрощенная проверка стыковки
+    for (const dir of dirs) {
+      const [dr, dc] = DIRS[dir];
+      const neigh = getCell(r + dr, c + dc);
+      if (neigh && neigh.dataset.pipe) {
+        const neighDirs = getPipeDirsFromCell(neigh);
+        const opp = OPP[dir];
+        if (!neighDirs.includes(opp)) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  // Обработка клика по клетке
+  function onCellClick(r, c) {
+    const cell = getCell(r, c);
+    if (!cell) return;
+    if (cell.classList.contains('start') || cell.classList.contains('goal')) return;
+
+    if (cell.dataset.pipe) {
+      cell.animate([{transform:'scale(1)'},{transform:'scale(1.04)'},{transform:'scale(1)'}],{duration:180});
+      return;
+    }
+
+    if (!selectedPipeType) {
+      alert('Сначала выберите трубу внизу.');
+      return;
+    }
+
+    if (!canPlacePipe(r, c, selectedPipeType)) {
+      alert('Эта труба не стыкуется с соседними!');
+      return;
+    }
+
+    // Установка трубы
+    renderPipe(cell, selectedPipeType);
+    pipesUsed++;
+
+    // Проверка типа зоны
+    if (cell.classList.contains('yellow-zone')) {
+      openQuestionModal(cell, 'yellow');
+    } else if (cell.classList.contains('white-zone')) {
+      openQuestionModal(cell, 'white');
+    } else if (cell.classList.contains('red-zone')) {
+      openQuestionModal(cell, 'red');
+    } else if (cell.classList.contains('gazik')) {
+      collectGazik(cell);
+    } else {
+      checkFlow();
+    }
+  }
+
+  // Открытие модалки с вопросом
+  function openQuestionModal(cell, zoneType) {
+    let questions, modal, answersEl, reward, penalty, floatingClass;
+
+    switch(zoneType) {
+      case 'yellow':
+        questions = YELLOW_QUESTIONS;
+        modal = quizModal;
+        answersEl = quizAnswers;
+        reward = 15;
+        penalty = 25;
+        floatingClass = '';
+        break;
+      case 'white':
+        questions = WHITE_QUESTIONS;
+        modal = whiteZoneModal;
+        answersEl = whiteZoneAnswers;
+        reward = 25;
+        penalty = 15;
+        floatingClass = 'white-zone-floating';
+        break;
+      case 'red':
+        questions = RED_QUESTIONS;
+        modal = redZoneModal;
+        answersEl = redZoneAnswers;
+        reward = 40;
+        penalty = 35;
+        floatingClass = 'red-zone-floating';
+        break;
+    }
+
+    const availableQuestions = questions.filter(q =>
+      zoneType === 'yellow' ? !usedQuestions.has(q.q) :
+      zoneType === 'white' ? !usedWhiteQuestions.has(q.q) :
+      !usedRedQuestions.has(q.q)
+    );
+
+    if (availableQuestions.length === 0) {
+      if (zoneType === 'yellow') usedQuestions.clear();
+      else if (zoneType === 'white') usedWhiteQuestions.clear();
+      else usedRedQuestions.clear();
+    }
+
+    const question = availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
+
+    if (zoneType === 'yellow') usedQuestions.add(question.q);
+    else if (zoneType === 'white') usedWhiteQuestions.add(question.q);
+    else usedRedQuestions.add(question.q);
+
+    answersEl.innerHTML = '';
+
+    // Установка вопроса
+    if (zoneType === 'yellow') {
+      document.getElementById('quizQuestion').textContent = question.q;
+    } else if (zoneType === 'white') {
+      document.getElementById('whiteZoneQuestion').textContent = question.q;
+    } else if (zoneType === 'red') {
+      document.getElementById('redZoneQuestion').textContent = question.q;
+    }
+
+    question.answers.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.textContent = opt.text;
+      btn.className = 'btn';
+      btn.addEventListener('click', () => {
+        modal.setAttribute('aria-hidden', 'true');
+        if (opt.correct) {
+          correctAnswers++;
+          rubles += reward;
+          createFloatingText(cell, `+${reward} ₽`, 'gold');
+        } else {
+          finGas = Math.max(0, finGas - penalty);
+          createFloatingText(cell, `-${penalty} 🔥`, '#2a7ade', floatingClass);
+        }
+        updateHUD();
+        cell.classList.remove(zoneType + '-zone');
+        checkFlow();
+      });
+      answersEl.appendChild(btn);
+    });
+
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  // Сбор газика
+  function collectGazik(cell) {
+    const product = BANK_PRODUCTS[Math.floor(Math.random() * BANK_PRODUCTS.length)];
+    productInfo.innerHTML = `
+      <h4>${product.name}</h4>
+      <p>${product.description}</p>
+    `;
+
+    productModal.setAttribute('aria-hidden', 'false');
+
+    productClose.onclick = () => {
+      productModal.setAttribute('aria-hidden', 'true');
+      finGas += 5;
+      gaziksCollected++;
+      createFloatingText(cell, '+5 🔥', '#2a7ade', 'gazik-floating');
+      cell.classList.remove('gazik');
+      updateHUD();
+      checkFlow();
+    };
+  }
+
+  // Создание всплывающего текста
+  function createFloatingText(cell, text, color, className = '') {
+    const floatingText = document.createElement('div');
+    floatingText.textContent = text;
+    floatingText.style.cssText = `
+      position: absolute;
+      pointer-events: none;
+      font-weight: 800;
+      color: ${color};
+      font-size: 20px;
+      z-index: 100;
+      transition: transform 0.9s ease, opacity 0.9s ease;
+      opacity: 1;
+    `;
+
+    if (className) {
+      floatingText.className = className;
+    }
+
+    const rect = cell.getBoundingClientRect();
+    const boardRect = boardEl.getBoundingClientRect();
+
+    floatingText.style.left = (rect.left - boardRect.left + rect.width / 2) + 'px';
+    floatingText.style.top = (rect.top - boardRect.top - 10) + 'px';
+
+    boardEl.parentElement.appendChild(floatingText);
+
+    setTimeout(() => {
+      floatingText.style.opacity = '0';
+      floatingText.style.transform = 'translateY(-70px)';
+      setTimeout(() => {
+        if (floatingText.parentElement) {
+          floatingText.parentElement.removeChild(floatingText);
+        }
+      }, 900);
+    }, 100);
+  }
+
+  // Проверка потока
+  function checkFlow() {
+    const start = { r: 6, c: 0 };
+    const goal = { r: 0, c: 4 };
+    const startKey = `${start.r},${start.c}`;
+    const goalKey = `${goal.r},${goal.c}`;
+
+    const visited = new Set();
+    const prev = new Map();
+    const queue = [startKey];
+
+    function pushIfValid(nr, nc, fromKey) {
+      const k = `${nr},${nc}`;
+      if (visited.has(k)) return;
+      const neigh = getCell(nr, nc);
+      if (!neigh) return;
+      queue.push(k);
+      prev.set(k, fromKey);
+    }
+
+    function canConnect(r, c, dirKey) {
+      const cell = getCell(r, c);
+      if (!cell) return false;
+      const type = cell.dataset.pipe;
+      if (!type) return false;
+      const dirs = TYPE_DEFS[type].dirs;
+      return dirs.includes(dirKey);
+    }
+
+    while (queue.length) {
+      const key = queue.shift();
+      if (visited.has(key)) continue;
+      visited.add(key);
+      const [r, c] = key.split(',').map(Number);
+
+      if (r === goal.r && c === goal.c) {
+        const path = reconstructPath(prev, key, startKey);
+        animateFlow(path);
+        return true;
+      }
+
+      const curCell = getCell(r, c);
+      const curType = curCell ? curCell.dataset.pipe : null;
+      if (!curType || !TYPE_DEFS[curType]) continue;
+
+      for (const dirKey of TYPE_DEFS[curType].dirs) {
+        const [dr, dc] = DIRS[dirKey];
+        const nr = r + dr, nc = c + dc;
+        if (nr < 0 || nr >= rows || nc < 0 || nc >= cols) continue;
+        const neigh = getCell(nr, nc);
+        if (!neigh) continue;
+
+        if (neigh.classList.contains('goal')) {
+          prev.set(goalKey, key);
+          const path = reconstructPath(prev, goalKey, startKey);
+          animateFlow(path);
+          return true;
+        }
+
+        const neighType = neigh.dataset.pipe;
+        if (!neighType) continue;
+        const oppKey = OPP[dirKey];
+        if (TYPE_DEFS[neighType].dirs.includes(oppKey)) {
+          const nkey = `${nr},${nc}`;
+          if (!visited.has(nkey) && !queue.includes(nkey)) {
+            prev.set(nkey, key);
+            queue.push(nkey);
+          }
+        }
+      }
+    }
+    return false;
+  }
+
+  function reconstructPath(prevMap, endKey, startKey) {
+    const path = [];
+    let cur = endKey;
+    while (cur) {
+      path.push(cur);
+      if (cur === startKey) break;
+      cur = prevMap.get(cur);
+    }
+    return path.reverse();
+  }
+
+  let flowInProgress = false;
+  function animateFlow(pathKeys) {
+    if (flowInProgress) return;
+    flowInProgress = true;
+
+    document.querySelectorAll('.cell.flow').forEach(el => el.classList.remove('flow'));
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i >= pathKeys.length) {
+        clearInterval(interval);
+        flowInProgress = false;
+        completeLevel();
+        return;
+      }
+      const [r, c] = pathKeys[i].split(',').map(Number);
+      const cell = getCell(r, c);
+      if (cell) cell.classList.add('flow');
+      i++;
+    }, 240);
+  }
+
+  // Завершение уровня
+  function completeLevel() {
+    const baseReward = 20;
+    const pipeBonus = Math.max(0, 30 - pipesUsed * 2);
+    const answerBonus = correctAnswers * 10;
+    const gazikBonus = gaziksCollected * 5;
+
+    const totalReward = baseReward + pipeBonus + answerBonus + gazikBonus;
+    rubles += totalReward;
+    localStorage.setItem('fg_rub', rubles);
+    localStorage.setItem('fg_gas', finGas);
+
+    resultNote.textContent = `Супер! Тебе опять начислили много Рубликов за успешное прохождение уровня!`;
+    bonusInfo.innerHTML = `
+      <div class="bonus-item">Всего получено: +${totalReward} ₽</div>
+      <div class="bonus-item">Базовая награда: +${baseReward} ₽</div>
+      <div class="bonus-item">Бонус за трубы: +${pipeBonus} ₽</div>
+      <div class="bonus-item">Бонус за ответы: +${answerBonus} ₽</div>
+      <div class="bonus-item">Бонус за газики: +${gazikBonus} ₽</div>
+    `;
+
+    resultModal.setAttribute('aria-hidden', 'false');
+  }
+
+  // Вспомогательные функции
+  function updateHUD() {
+    rublesEl.textContent = rubles;
+    finGasEl.textContent = finGas;
+    playerNameEl.textContent = localStorage.getItem('fg_name') || 'Игрок';
+  }
+
+  // Диалоги
+  const DIALOGS = [
+    'Ты прекрасно справился с первым уровнем: не дал мошенникам себя обмануть и сохранил большую часть ФинГаза!',
+    'Но все не так просто, впереди тебя ждут новые испытания.',
+    '*появляются разноцветные зоны*',
+    'Теперь тебе предстоит столкнуться с разными типами вопросов:',
+    'Желтые - легкие вопросы (+15₽/-25🔥), Белые - средние (+25₽/-15🔥), Красные - сложные (+40₽/-35🔥)',
+    'Повторюсь, если ты неправильно ответишь на вопросы, то потеряешь часть ФинГаза.'
+  ];
+
+  nextBtn.addEventListener('click', () => {
+    if (dialogIdx < DIALOGS.length) {
+      dialogText.textContent = DIALOGS[dialogIdx];
+      if (dialogIdx === 2) {
+        // Подсветка всех зон
+        setTimeout(() => {
+          document.querySelectorAll('.yellow-zone, .white-zone, .red-zone').forEach(cell => {
+            cell.classList.add('tutorial');
+            setTimeout(() => cell.classList.remove('tutorial'), 2000);
+          });
+        }, 500);
+      }
+      dialogIdx++;
+    } else {
+      dialogText.textContent = 'Теперь попробуй построить путь к мечте!';
+      nextBtn.disabled = true;
+      nextBtn.style.display = 'none';
+    }
+  });
+
+  // Обработчики модальных окон
+  quizClose.addEventListener('click', () => quizModal.setAttribute('aria-hidden', 'true'));
+  whiteZoneClose.addEventListener('click', () => whiteZoneModal.setAttribute('aria-hidden', 'true'));
+  redZoneClose.addEventListener('click', () => redZoneModal.setAttribute('aria-hidden', 'true'));
+  productClose.addEventListener('click', () => productModal.setAttribute('aria-hidden', 'true'));
+
+  closeResult.addEventListener('click', () => {
+    resultModal.setAttribute('aria-hidden', 'true');
+    setTimeout(() => {
+      dialogText.textContent = "Ты также можешь получать еще больше Рубликов и Газиков в ежедневных наградах.";
+      nextBtn.disabled = false;
+      nextBtn.style.display = 'inline-block';
+      nextBtn.textContent = "Посмотреть награды";
+
+      nextBtn.onclick = () => {
+        dailyModal.setAttribute('aria-hidden', 'false');
+        nextBtn.style.display = 'none';
+      };
+    }, 500);
+  });
+
+  closeDaily.addEventListener('click', () => {
+    dailyModal.setAttribute('aria-hidden', 'true');
+    setTimeout(() => {
+      window.location.href = 'index.html';
+    }, 500);
+  });
+
+  nextLevelBtn.addEventListener('click', () => {
+    dailyModal.setAttribute('aria-hidden', 'true');
+    setTimeout(() => {
+      window.location.href = 'level3.html';
+    }, 500);
+  });
+
+  // Инициализация
+  initBoard();
+  updateHUD();
+  choosePipe('H');
+});
+</script>
+</body>
+</html>
