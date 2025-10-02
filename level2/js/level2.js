@@ -333,7 +333,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Обработка клика по клетке
-  // ОБНОВЛЕННАЯ функция onCellClick
   function onCellClick(r, c) {
     const cell = getCell(r, c);
     if (!cell) return;
@@ -360,11 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Установка трубы
-    renderPipe(cell, selectedPipeType);
-    pipesUsed++;
-
-    // Проверка специальных клеток
+    // Обработка специальных клеток ПЕРЕД установкой трубы
     if (cell.classList.contains('yellow-zone')) {
       if (!hasSeenYellowZoneIntro) {
         showYellowZoneIntro(cell);
@@ -375,9 +370,23 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!hasSeenGazikiIntro) {
         showGazikiIntro(cell);
       } else {
-        collectGazik(cell);
+        // Для газика сначала собираем его, потом ставим трубу
+        collectGazik(cell, () => {
+          // Колбэк, который выполнится после сбора газика
+          renderPipe(cell, selectedPipeType);
+          pipesUsed++;
+          checkFlow();
+        });
+        return; // Выходим, не ставя трубу сразу
       }
-    } else {
+    }
+
+    // Установка трубы для обычных клеток и желтых зон
+    renderPipe(cell, selectedPipeType);
+    pipesUsed++;
+
+    // Для желтых зон проверка потока уже выполнится после квиза
+    if (!cell.classList.contains('yellow-zone')) {
       checkFlow();
     }
   }
@@ -394,19 +403,24 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Введение про Газики (при первом входе на газик)
+  // Введение про Газики (при первом входе на газик)
   function showGazikiIntro(cell) {
     hasSeenGazikiIntro = true;
     gazikIntroModal.setAttribute('aria-hidden', 'false');
 
     gazikIntroClose.onclick = () => {
       gazikIntroModal.setAttribute('aria-hidden', 'true');
-      collectGazik(cell);
+      // После вводного окна сразу собираем газик
+      collectGazik(cell, () => {
+        // Колбэк, который выполнится после сбора газика
+        renderPipe(cell, selectedPipeType);
+        pipesUsed++;
+        checkFlow();
+      });
     };
   }
 
   // Финансовый квиз
-  // Финансовый квиз
-  // Финансовый квиз - ОБНОВЛЕННЫЕ КНОПКИ КАК В 3 УРОВНЕ
   function openFinanceQuiz(cell) {
     const availableQuestions = FINANCE_QUESTIONS.filter(q => !usedQuestions.has(q.q));
 
@@ -445,8 +459,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Сбор газика
-  // Сбор газика (исправленная версия)
-  function collectGazik(cell) {
+  function collectGazik(cell, callback) {
     const product = BANK_PRODUCTS[Math.floor(Math.random() * BANK_PRODUCTS.length)];
     productInfo.innerHTML = `
       <h4>${product.name}</h4>
@@ -462,7 +475,11 @@ document.addEventListener('DOMContentLoaded', () => {
       createImageFloatingText(cell, '+', 'images/gazik.png', '#2a7ade', 'gazik-floating');
       cell.classList.remove('gazik');
       updateHUD();
-      checkFlow();
+
+      // Вызываем колбэк после сбора газика
+      if (callback) {
+        callback();
+      }
     };
   }
 
@@ -483,7 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
       opacity: 1;
     `;
 
-    // ДОБАВЛЯЕМ эту проверку для класса:
+    // сюда эту проверку для класса:
     if (className) {
       floatingText.className = className;
     }
@@ -769,7 +786,6 @@ document.addEventListener('DOMContentLoaded', () => {
   initBoard();
   updateHUD();
 });
-// ДОБАВЬТЕ эту функцию в раздел вспомогательных функций
 function adjustLayoutForViewport() {
   const viewportHeight = window.innerHeight;
   const gameArea = document.querySelector('.game-area');
