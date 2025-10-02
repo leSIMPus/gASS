@@ -209,6 +209,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Обновление интерфейса
     updateHUD();
+    adjustLayoutForViewport();
+    window.addEventListener('resize', adjustLayoutForViewport);
   }
 
   // Размещение желтых зон
@@ -682,3 +684,25 @@ document.addEventListener('DOMContentLoaded', () => {
   initBoard();
   updateHUD();
 });
+// ДОБАВЬТЕ эту функцию в раздел вспомогательных функций
+function adjustLayoutForViewport() {
+  const viewportHeight = window.innerHeight;
+  const gameArea = document.querySelector('.game-area');
+  const boardContainer = document.querySelector('.board-container');
+  const mobilePanel = document.getElementById('mobilePipePanel');
+
+  // Если высота viewport меньше 700px, включаем компактный режим
+  if (viewportHeight < 700) {
+    document.body.style.overflowY = 'auto';
+    if (boardContainer) {
+      boardContainer.style.padding = '5px';
+    }
+    if (mobilePanel) {
+      mobilePanel.style.minHeight = '60px';
+    }
+  } else {
+    document.body.style.overflowY = 'hidden';
+  }
+}
+
+
