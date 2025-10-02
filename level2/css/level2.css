@@ -115,7 +115,7 @@ body {
   margin: 0 0 12px 0;
   color: #333;
 }
-/* Игровое поле - ГАРАНТИРУЕМ КВАДРАТНЫЕ КЛЕТКИ */
+/* Игровое поле - ПОДГОНЯЕМ РАЗМЕР ПОД КВАДРАТНЫЕ КЛЕТКИ */
 .board-container {
   flex: 1;
   display: flex;
@@ -132,10 +132,10 @@ body {
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(7, 1fr);
   gap: 2px;
-  /* ПРОСТОЙ И НАДЕЖНЫЙ РАСЧЕТ */
-  width: 90vmin;
-  height: calc(90vmin * 7 / 5);
-  max-width: 350px;
+  /* РАСЧЕТ ДЛЯ ИДЕАЛЬНОГО СООТВЕТСТВИЯ КЛЕТОК */
+  width: calc(90vmin * 5 / 7 * 5 / 5); /* 5 клеток в ширину */
+  height: calc(90vmin * 7 / 7); /* 7 клеток в высоту */
+  max-width: calc(350px * 5 / 7 * 5 / 5);
   max-height: 490px;
   background: #bdcefa;
   border-radius: 8px;
@@ -143,6 +143,8 @@ body {
   box-shadow: 0 4px 15px rgba(0,0,0,0.05);
   padding: 2px;
   flex-shrink: 0;
+  /* Гарантируем правильные пропорции */
+  aspect-ratio: 5 / 7;
 }
 
 .cell {
@@ -159,7 +161,11 @@ body {
   transition: all 0.2s;
   /* ГАРАНТИЯ КВАДРАТНЫХ КЛЕТОК */
   aspect-ratio: 1 / 1;
+  /* Убеждаемся, что клетки заполняют всю доступную область */
+  width: 100%;
+  height: 100%;
 }
+
 
 .cell:hover {
   transform: scale(1.03);
@@ -507,33 +513,33 @@ body {
     touch-action: pan-x pan-y;
   }
 }
-
-/* АДАПТАЦИЯ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ */
 /* АДАПТАЦИЯ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ */
 @media (max-height: 700px) {
   .board-container {
     padding: 5px;
   }
-
+  
   #board {
-    width: min(85vw, 85vh * 5/7, 320px);
-    height: min(calc(85vw * 7/5), 85vh, 450px);
+    width: calc(85vmin * 5 / 7 * 5 / 5);
+    height: calc(85vmin * 7 / 7);
+    max-height: 400px;
+    max-width: calc(320px * 5 / 7 * 5 / 5);
   }
-
+  
   .mobile-pipe-panel {
     padding: 6px 10px;
     height: 60px;
   }
-
+  
   .pipe-buttons-mobile .btn {
     min-height: 35px;
   }
-
+  
   .pipe-choice-mobile p {
     margin: 0 0 4px;
     font-size: 13px;
   }
-
+  
   .cell {
     font-size: 14px;
   }
@@ -542,23 +548,25 @@ body {
 /* Для очень маленьких экранов */
 @media (max-height: 600px) {
   #board {
-    width: min(80vw, 80vh * 5/7, 300px);
-    height: min(calc(80vw * 7/5), 80vh, 420px);
+    width: calc(80vmin * 5 / 7 * 5 / 5);
+    height: calc(80vmin * 7 / 7);
+    max-height: 350px;
+    max-width: calc(300px * 5 / 7 * 5 / 5);
   }
-
+  
   .mobile-pipe-panel {
     height: 55px;
   }
-
+  
   .pipe-buttons-mobile .btn {
     min-height: 32px;
   }
-
+  
   .pipe-buttons-mobile .btn img.pipe-img {
     width: 18px;
     height: 18px;
   }
-
+  
   .cell {
     font-size: 13px;
   }
@@ -567,29 +575,38 @@ body {
 /* Для экстремально маленьких экранов */
 @media (max-height: 500px) {
   #board {
-    width: min(75vw, 75vh * 5/7, 280px);
-    height: min(calc(75vw * 7/5), 75vh, 390px);
+    width: calc(75vmin * 5 / 7 * 5 / 5);
+    height: calc(75vmin * 7 / 7);
+    max-height: 320px;
+    max-width: calc(280px * 5 / 7 * 5 / 5);
     gap: 1px;
     padding: 1px;
   }
-
+  
   .mobile-pipe-panel {
     height: 50px;
     padding: 4px 8px;
   }
-
+  
   .pipe-buttons-mobile {
     gap: 2px;
   }
-
+  
   .cell {
     font-size: 12px;
   }
 }
 
-/* Отключаем скроллинг на больших экранах */
-@media (min-height: 800px) {
+/* Для очень широких экранов (ландшафтная ориентация) */
+@media (max-width: 700px) and (orientation: landscape) {
+  #board {
+    width: calc(80vmin * 5 / 7 * 5 / 5);
+    height: calc(80vmin * 7 / 7);
+    max-width: calc(300px * 5 / 7 * 5 / 5);
+    max-height: 420px;
+  }
+  
   .board-container {
-    overflow: hidden;
+    padding: 5px;
   }
 }
