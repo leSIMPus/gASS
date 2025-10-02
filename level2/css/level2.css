@@ -593,3 +593,8 @@ body {
     overflow: hidden;
   }
 }
+@media (min-height: 800px) {
+  .board-container {
+    overflow: hidden;
+  }
+}
