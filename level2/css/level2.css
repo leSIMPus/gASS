@@ -372,6 +372,7 @@ body {
 }
 
 /* Стили для ответов - ТЕПЕРЬ КАК В 3 УРОВНЕ */
+/* Стили для ответов - ЦВЕТНЫЕ КНОПКИ С ГРАДИЕНТОМ */
 .answers {
   display: flex;
   flex-direction: column;
@@ -382,18 +383,18 @@ body {
 .answers button {
   padding: 12px;
   border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, .06);
+  border: 0;
+  background: linear-gradient(90deg, var(--accent), var(--extra), var(--goal));
+  font-weight: 800;
   cursor: pointer;
-  background: #f5f5f5;
-  transition: all 0.2s;
+  transition: transform 0.15s;
+  color: #fff;
   font-size: 14px;
-  color: #333;
   width: 100%;
 }
 
 .answers button:hover {
-  background: #e8f4ff;
-  border-color: var(--accent);
+  transform: scale(1.05);
 }
 
 .product-info {
