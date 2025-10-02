@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeDaily = document.getElementById('closeDaily');
   const nextLevelBtn = document.getElementById('nextLevel'); // Новая кнопка
   const playerNameEl = document.getElementById('playerName');
+  const nextLevelResult = document.getElementById('nextLevelResult');
 
   // Новые элементы для обучающих модалок
   const yellowZoneIntroModal = document.getElementById('yellowZoneIntroModal');
@@ -613,7 +614,7 @@ document.addEventListener('DOMContentLoaded', () => {
     playerNameEl.textContent = localStorage.getItem('fg_name') || 'Игрок';
   }
 
-  // Диалоги 
+  // Диалоги
   const DIALOGS = [
     'Не дал мошенникам себя обмануть и сохранил большую часть ФинГаза!',
     'Но все не так просто, впереди тебя ждут новые испытания.',
@@ -647,20 +648,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Обработчики модальных окон
   quizClose.addEventListener('click', () => quizModal.setAttribute('aria-hidden', 'true'));
 
-  closeResult.addEventListener('click', () => {
+  nextLevelResult.addEventListener('click', () => {
     resultModal.setAttribute('aria-hidden', 'true');
-    // Показываем сообщение про ежедневные награды
+    // Переход на третий уровень
     setTimeout(() => {
-      dialogText.textContent = "Ты также можешь получать еще больше Рубликов и Газиков в ежедневных наградах.";
-      nextBtn.disabled = false;
-      nextBtn.style.display = 'inline-block';
-      nextBtn.textContent = "Посмотреть награды";
-
-      nextBtn.onclick = () => {
-        dailyModal.setAttribute('aria-hidden', 'false');
-        nextBtn.style.display = 'none';
-      };
-    }, 500);
+      window.location.href = '../level3/level3.html';
+    }, 300);
   });
 
   closeDaily.addEventListener('click', () => {
