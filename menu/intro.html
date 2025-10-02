@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ФинГаз — Начало</title>
+    <link rel="stylesheet" href="intro.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div id="game-container">
+    <img id="finn" src="assets/finn_without_mouth.png" alt="Финн">
+
+    <!-- Диалоговое окно -->
+    <div id="dialogue-box">
+        <div id="speaker-name"></div>
+        <div id="dialogue-text"></div>
+    </div>
+
+    <!-- Ввод имени -->
+    <div id="name-popup">
+        <p>Введите своё имя:</p>
+        <input type="text" id="player-name" placeholder="Ваше имя">
+        <button id="name-btn">Начать</button>
+    </div>
+
+    <!-- Подтверждение старта -->
+    <div id="popup" style="display:none;">
+        <p>Готовы ли вы начать своё финансовое путешествие?</p>
+        <button id="start-btn">Конечно!</button>
+    </div>
+</div>
+
+<script src="intro.js"></script>
+</body>
+</html>

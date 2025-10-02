@@ -2,7 +2,7 @@ body {
   margin: 0;
   padding: 0;
   height: 100vh;
-  background: #4075FC url('assets/background2.png') no-repeat center center;
+  background: #2d11a4 url('assets/background.png') no-repeat center center;
   background-size: contain;
 }
 
@@ -132,9 +132,9 @@ body {
 }
 
 #finn {
-  width: 300px;
-  bottom: 150px;
-  left: 50%;
+  width: 680px;
+  bottom: 135px;
+  left: 55%;
   transform: translateX(-50%);
 }
 
@@ -182,7 +182,7 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(#4075FC, #FF7801);
+    background: radial-gradient(circle, white 0%, #4800a3 100%);
     border: none;
     border-radius: 12px;
     padding: 10px;
@@ -196,14 +196,20 @@ body {
 }
 
 .lobby-btn img {
-    width: 36px;
-    height: 36px;
+    width: 60px;
+    height: 60px;
     margin-bottom: 5px;
 }
 
 .lobby-btn:hover {
     transform: scale(1.1);
     opacity: 0.9;
+}
+
+#level-number {
+    font-size: 40px;
+    font-weight: bold;
+    color: #e600c0;
 }
 
 /* выбор уровня */

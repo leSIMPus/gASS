@@ -13,187 +13,175 @@
   box-sizing: border-box;
 }
 
-body {
+html, body {
+  height: 100%;
   margin: 0;
+  padding: 0;
+  /* ВОЗВРАЩАЕМ overflow: hidden для основного контента */
+  overflow: hidden;
+}
+
+body {
   font-family: Inter, Arial, sans-serif;
   background: linear-gradient(180deg, var(--bg1), var(--bg2));
   color: #0e2b36;
-  min-height: 100vh;
+  /* Используем flex для правильного распределения пространства */
+  display: flex;
+  flex-direction: column;
 }
 
 .hud {
   display: flex;
-  gap: 20px;
-  padding: 16px;
+  gap: 10px;
+  padding: 8px 12px;
   background: linear-gradient(90deg, var(--accent), var(--extra), var(--goal));
   color: #fff;
   font-weight: 700;
   align-items: center;
   flex-wrap: wrap;
+  font-size: 14px;
+  height: 50px;
+  flex-shrink: 0; /* Не сжимаем HUD */
 }
 
 .hud-item {
   background: rgba(255, 255, 255, 0.2);
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 15px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 13px;
   backdrop-filter: blur(10px);
 }
 
 .game-area {
   display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  justify-content: center;
-  padding: 12px;
+  flex-direction: column;
+  flex: 1; /* Занимаем все оставшееся пространство */
+  position: relative;
+  min-height: 0; /* Важно для flex-контейнера */
 }
 
-.side-panel {
-  width: 280px;
-  background: #fff;
-  padding: 16px;
-  border-radius: 12px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  margin: 0;
-}
-
-#board {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  grid-template-rows: repeat(8, 1fr);
-  gap: 0;
-  padding: 0;
-  width: 90vw;       /* ширина 90% экрана */
-  height: 90vw;      /* высота = ширине, квадрат */
-  max-width: 500px;  /* ограничение для больших экранов */
-  max-height: 500px;
-  background: #bdcefa;
-  border-radius: 12px;
-  border: 2px solid rgba(0,0,0,0.05);
-  box-shadow: 0 6px 20px rgba(0,0,0,0.05);
-}
-
-@media (max-width: 768px) {
-  #board {
-    width: calc(100vw - 40px);
-    height: calc(100vw - 40px);
-  }
-
-  .game-area {
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .side-panel {
-    width: 100%;
-    max-width: 380px;
-  }
-}
-
-.character {
-  text-align: center;
-  margin-bottom: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid #f0f0f0;
-}
-
-.char-img {
-  width: 76px;
-  height: 76px;
-  border-radius: 12px;
-  background: linear-gradient(135deg, var(--accent), var(--extra));
+.dialog-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
+  z-index: 100;
+  padding: 20px;
+}
+
+.dialog-box-overlay {
+  background: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  max-width: 320px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.character-overlay {
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.character-overlay .char-img {
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
   color: #fff;
   margin: 0 auto 6px;
 }
 
-.char-name {
+.character-overlay .char-name {
   font-weight: 700;
-  color: var(--accent);
-  margin-top: 4px;
-}
-
-.dialog-box {
-  background: #f8fbff;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  border-left: 4px solid var(--warning);
-}
-
-.dialog-box p {
+  color: #ff6600;
   font-size: 14px;
-  line-height: 1.5;
+}
+
+.dialog-box-overlay p {
+  font-size: 14px;
+  line-height: 1.4;
   margin: 0 0 12px 0;
   color: #333;
 }
 
-.btn {
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 0;
-  background: linear-gradient(90deg, var(--accent), var(--extra), var(--goal));
-  font-weight: 800;
-  cursor: pointer;
-  transition: transform 0.15s;
-  color: #fff;
-}
-
-.btn:hover {
-  transform: scale(1.05);
-}
-
-.btn.ghost {
-  background: transparent;
-  border: 1px solid rgba(0, 0, 0, .06);
-  color: var(--accent);
-}
-
+/* Игровое поле  */
 .board-container {
   flex: 1;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 12px;
-  position: relative;
+  justify-content: center;
+  width: 100%;
+  padding: 10px;
+  min-height: 0;
+  background: #bdcefa;
+  /* Добавляем возможность скролла ТОЛЬКО если не помещается */
+  overflow: auto;
+}
+#board {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(7, 1fr);
+  gap: 2px;
+  /* ИСПРАВЛЯЕМ РАСЧЕТ РАЗМЕРОВ - ОСНОВЫВАЕМСЯ НА МЕНЬШЕЙ СТОРОНЕ */
+  width: min(90vw, 90vh * 5/7, 350px);
+  height: min(calc(90vw * 7/5), 90vh, 490px);
+  background: #bdcefa;
+  border-radius: 8px;
+  border: 2px solid rgba(0,0,0,0.05);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  padding: 2px;
+  /* Запрещаем сжимание */
+  flex-shrink: 0;
+  /* Гарантируем квадратные клетки */
+  aspect-ratio: 5/7;
 }
 
 .cell {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 26px;
+  font-size: 16px;
   background: #dee1ee;
   border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 0;
+  border-radius: 4px;
   color: var(--accent);
   user-select: none;
   position: relative;
-  transition: background 0.2s, transform 0.1s;
-  aspect-ratio: 1 / 1;
+  transition: all 0.2s;
+  /* Гарантируем квадратные клетки */
+  aspect-ratio: 1/1;
 }
+
 
 .cell:hover {
   transform: scale(1.03);
   border-color: var(--accent);
-  box-shadow: 0 4px 8px rgba(42, 122, 222, 0.15);
+  box-shadow: 0 2px 6px rgba(42, 122, 222, 0.15);
 }
 
 .cell.start {
-  background: linear-gradient(180deg, #e9fff0, #c8ffd9);
+  background: linear-gradient(135deg, #e9fff0, #c8ffd9);
   color: #004d1a;
   font-weight: 900;
-  box-shadow: 0 6px 20px rgba(26, 184, 100, 0.12);
+  box-shadow: 0 4px 12px rgba(26, 184, 100, 0.12);
+  border: 2px solid #4bb;
 }
 
 .cell.goal {
-  background: linear-gradient(180deg, #fff7e9, #ffebc8);
+  background: linear-gradient(135deg, #fff7e9, #ffebc8);
   color: #6b3b00;
   font-weight: 900;
-  box-shadow: 0 6px 20px rgba(255, 184, 77, 0.12);
+  box-shadow: 0 4px 12px rgba(255, 184, 77, 0.12);
+  border: 2px solid #f93;
 }
 
 .cell.white-zone {
@@ -202,50 +190,18 @@ body {
   font-weight: 800;
   border: 1px solid #adadad;
   box-shadow: 0 4px 10px rgba(228, 226, 226, 0.25);
+  animation: pulse-white 2s infinite;
 }
 
-@keyframes fire-flicker {
+@keyframes pulse-white {
   0%, 100% {
     transform: scale(1);
-    color: #2a7ade;
   }
-  25% {
+  50% {
     transform: scale(1.05);
-    color: #00c3ff;
-  }
-  50% {
-    transform: scale(0.98);
-    color: #1a5fb4;
-  }
-  75% {
-    transform: scale(1.03);
-    color: #4d9fff;
   }
 }
 
-@keyframes fire-glow {
-  0%, 100% {
-    opacity: 0.5;
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    opacity: 0.8;
-    transform: translate(-50%, -50%) scale(1.1);
-  }
-}
-
-.cell.gazik::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(circle, rgba(42, 122, 222, 0.3) 0%, transparent 70%);
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  animation: fire-glow 2s infinite alternate;
-}
 
 @keyframes blue-pulse {
   0% {
@@ -263,37 +219,179 @@ body {
 }
 
 .cell.flow {
+  background: linear-gradient(135deg, rgba(0,195,255,0.15), rgba(0,195,255,0.08));
   color: var(--flow);
-  text-shadow: 0 0 10px rgba(0, 195, 255, 0.9);
+  text-shadow: 0 0 8px rgba(0, 195, 255, 0.9);
+  border-color: var(--flow);
 }
 
-.modal {
-  position: fixed;
-  inset: 0;
+.cell.has-pipe {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 1px;
+}
+
+.cell.has-pipe img.pipe-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.cell.pipe-fixed {
+  box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.04);
+}
+
+/* Мобильная панель выбора труб - ФИКСИРОВАННАЯ ВЫСОТА */
+.mobile-pipe-panel {
+  width: 100%;
+  padding: 8px 12px;
+  background: #fff;
+  border-top: 2px solid #e0e0e0;
+  flex-shrink: 0; /* Не сжимаем панель */
+  height: 70px; /* Фиксированная высота */
+}
+
+.pipe-choice-mobile p {
+  margin: 0 0 8px;
+  font-weight: 600;
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+}
+
+.pipe-buttons-mobile {
+  display: flex;
+  gap: 4px;
+  justify-content: space-between;
+}
+
+.pipe-buttons-mobile .btn {
+  flex: 1;
+  min-height: 40px;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+  transition: all 0.2s ease;
+}
+
+.pipe-buttons-mobile .btn:hover {
+  background: #e8f4ff;
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.pipe-buttons-mobile .btn.active {
+  border: 2px solid var(--accent);
+  background: #d6ecff;
+}
+
+.pipe-buttons-mobile .btn img.pipe-img {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* Кнопки */
+.btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 0;
+  background: linear-gradient(90deg, var(--accent), var(--extra), var(--goal));
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s;
+  color: #fff;
+  font-size: 14px;
+}
+
+.btn:hover {
+  transform: scale(1.05);
+}
+
+.btn.ghost {
+  background: transparent;
+  border: 1px solid rgba(0, 0, 0, .06);
+  color: var(--accent);
+}
+
+/* Модальные окна */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
   background: rgba(0, 0, 0, 0.45);
-  visibility: hidden;
-  opacity: 0;
-  transition: opacity .15s;
+  z-index: 1000;
+  padding: 20px;
 }
 
 .modal[aria-hidden="false"] {
-  visibility: visible;
-  opacity: 1;
+  display: flex;
 }
 
 .modal-content {
   background: #fff;
   padding: 16px;
   border-radius: 10px;
-  max-width: 420px;
+  max-width: 320px;
+  width: 100%;
   text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-.daily-rewards {
-  max-width: 500px;
+/* Стили для ответов - ТЕПЕРЬ КАК В 3 УРОВНЕ */
+.answers {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.answers button {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(0, 0, 0, .06);
+  cursor: pointer;
+  background: #f5f5f5;
+  transition: all 0.2s;
+  font-size: 14px;
+  color: #333;
+  width: 100%;
+}
+
+.answers button:hover {
+  background: #e8f4ff;
+  border-color: var(--accent);
+}
+
+.product-info {
+  text-align: left;
+  margin: 12px 0;
+  padding: 12px;
+  background: #f9f9f9;
+  border-radius: 8px;
+}
+
+.product-info h4 {
+  margin: 0 0 8px 0;
+  color: var(--accent);
+}
+
+.product-info p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 .rewards-grid {
@@ -315,140 +413,6 @@ body {
   font-weight: bold;
 }
 
-.answers {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 8px;
-}
-
-.answers button {
-  padding: 8px;
-  border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, .06);
-  cursor: pointer;
-}
-
-.product-info {
-  text-align: left;
-  margin: 12px 0;
-  padding: 12px;
-  background: #f9f9f9;
-  border-radius: 8px;
-}
-
-#pipeChoice {
-  margin-top: 16px;
-  padding: 12px;
-  border: 2px solid #e0e0e0;
-  border-radius: 12px;
-  background: #f8fbff;
-  text-align: center;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
-}
-
-#pipeChoice p {
-  margin: 0 0 12px;
-  font-weight: 600;
-  font-size: 15px;
-  color: #333;
-}
-
-.pipe-buttons button {
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-
-
-.pipe-buttons img.pipe-img {
-  width: 30px;   /* размер картинки в кнопке */
-  height: 30px;
-  object-fit: contain;
-  pointer-events: none; /* чтобы клики проходили на кнопку */
-}
-
-#pipeChoice .btn {
-  width: 100%;
-  min-height: 44px;
-  font-size: 24px;
-  cursor: pointer;
-  border: 2px solid #ccc;
-  border-radius: 8px;
-  background: #fff;
-  transition: all 0.2s ease;
-  color: var(--accent);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px;
-}
-
-#pipeChoice .btn:hover {
-  background: #e8f4ff;
-  border-color: var(--accent);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(42, 122, 222, 0.2);
-}
-
-#pipeChoice .btn.active {
-  border: 3px solid var(--accent);
-  background: #d6ecff;
-  color: #0e2b36;
-  font-weight: 900;
-}
-
-.cell.pipe {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 22px;
-}
-
-.pipe-sym {
-  pointer-events: none;
-}
-
-.cell.start {
-  background: #d0f0ff;
-  border: 2px solid #4bb;
-}
-
-.cell.goal {
-  background: #ffe6cc;
-  border: 2px solid #f93;
-}
-
-.cell.has-pipe {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px; /* чуть отступа от края клетки */
-}
-
-.cell.has-pipe img.pipe-img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  pointer-events: none; /* чтобы клики проходили через картинку на саму клетку */
-}
-
-
-.cell.flow {
-  background: linear-gradient(180deg, rgba(0,195,255,0.12), rgba(0,195,255,0.06));
-  box-shadow: 0 6px 18px rgba(0,195,255,0.08);
-  color: var(--flow);
-}
-
-.cell.pipe-fixed {
-  box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), 0 6px 18px rgba(0,0,0,0.04);
-}
-
-.modal { display: none; align-items: center; justify-content: center; }
-.modal[aria-hidden="false"] { display: flex; }
-
 .bonus-item {
   margin: 8px 0;
   padding: 6px;
@@ -457,22 +421,11 @@ body {
   font-size: 14px;
 }
 
-/* Стиль для tutorial подсветки */
-.cell.tutorial {
-  box-shadow: 0 0 0 3px var(--accent);
-  z-index: 10;
-}
-
-
-@keyframes pulse-glow {
-  0% {
-    opacity: 0.3;
-    transform: translate(-50%, -50%) scale(0.8);
-  }
-  100% {
-    opacity: 0.7;
-    transform: translate(-50%, -50%) scale(1.2);
-  }
+/* Анимации для специальных эффектов */
+.gazik-floating {
+  color: #2a7ade !important;
+  text-shadow: 0 0 8px rgba(42, 122, 222, 0.7);
+  animation: float-text 1s ease-in-out;
 }
 
 @keyframes float-text {
@@ -486,3 +439,139 @@ body {
   }
 }
 
+/* Стиль для tutorial подсветки */
+.cell.tutorial {
+  box-shadow: 0 0 0 3px var(--accent);
+  z-index: 10;
+}
+
+/* Скрываем боковую панель на мобильных */
+.side-panel {
+  display: none;
+}
+
+/* Десктопная версия */
+@media (min-width: 769px) {
+  .mobile-pipe-panel {
+    display: none;
+  }
+
+  .side-panel {
+    display: block;
+  }
+
+  .game-area {
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 12px;
+  }
+}
+
+/* ИСПРАВЛЕНИЯ ДЛЯ СОВМЕСТИМОСТИ С БРАУЗЕРАМИ */
+@supports (-webkit-touch-callout: none) {
+  /* iOS Safari */
+  .game-area {
+    height: -webkit-fill-available;
+  }
+}
+
+.cell {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Предотвращение масштабирования на iOS */
+@media (max-width: 768px) {
+  body {
+    touch-action: pan-x pan-y;
+  }
+}
+
+/* АДАПТАЦИЯ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ */
+/* АДАПТАЦИЯ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ */
+@media (max-height: 700px) {
+  .board-container {
+    padding: 5px;
+  }
+
+  #board {
+    width: min(85vw, 85vh * 5/7, 320px);
+    height: min(calc(85vw * 7/5), 85vh, 450px);
+  }
+
+  .mobile-pipe-panel {
+    padding: 6px 10px;
+    height: 60px;
+  }
+
+  .pipe-buttons-mobile .btn {
+    min-height: 35px;
+  }
+
+  .pipe-choice-mobile p {
+    margin: 0 0 4px;
+    font-size: 13px;
+  }
+
+  .cell {
+    font-size: 14px;
+  }
+}
+
+/* Для очень маленьких экранов */
+@media (max-height: 600px) {
+  #board {
+    width: min(80vw, 80vh * 5/7, 300px);
+    height: min(calc(80vw * 7/5), 80vh, 420px);
+  }
+
+  .mobile-pipe-panel {
+    height: 55px;
+  }
+
+  .pipe-buttons-mobile .btn {
+    min-height: 32px;
+  }
+
+  .pipe-buttons-mobile .btn img.pipe-img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .cell {
+    font-size: 13px;
+  }
+}
+
+/* Для экстремально маленьких экранов */
+@media (max-height: 500px) {
+  #board {
+    width: min(75vw, 75vh * 5/7, 280px);
+    height: min(calc(75vw * 7/5), 75vh, 390px);
+    gap: 1px;
+    padding: 1px;
+  }
+
+  .mobile-pipe-panel {
+    height: 50px;
+    padding: 4px 8px;
+  }
+
+  .pipe-buttons-mobile {
+    gap: 2px;
+  }
+
+  .cell {
+    font-size: 12px;
+  }
+}
+
+/* Отключаем скроллинг на больших экранах */
+@media (min-height: 800px) {
+  .board-container {
+    overflow: hidden;
+  }
+}

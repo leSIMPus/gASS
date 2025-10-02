@@ -1,6 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
   // DOM элементы
   const boardEl = document.getElementById('board');
+  const exitToMenu = document.getElementById('exitToMenu');
+  const dialogOverlay = document.getElementById('dialogOverlay');
+  const dialogTextOverlay = document.getElementById('dialogTextOverlay');
+  const nextBtnOverlay = document.getElementById('nextBtnOverlay');
   const dialogText = document.getElementById('dialogText');
   const nextBtn = document.getElementById('nextBtn');
   const rublesEl = document.getElementById('rubles');
@@ -19,13 +23,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const closeDaily = document.getElementById('closeDaily');
   const nextLevelBtn = document.getElementById('nextLevel'); // Новая кнопка
   const playerNameEl = document.getElementById('playerName');
+  const nextLevelResult = document.getElementById('nextLevelResult');
 
   // Новые элементы для обучающих модалок
   const whiteZoneIntroModal = document.getElementById('whiteZoneIntroModal');
   const whiteZoneIntroClose = document.getElementById('whiteZoneIntroClose');
 
   // состояние игры
-  const rows = 8, cols = 5;
+  const rows = 7, cols = 5;
   let grid = [];
   let selectedPipeType = null;
   let rubles = Number(localStorage.getItem('fg_rub')) || 0;
@@ -33,10 +38,8 @@ document.addEventListener('DOMContentLoaded', () => {
   let dialogIdx = 0;
   let pipesUsed = 0;
   let correctAnswers = 0;
-  let gaziksCollected = 0;
   let usedQuestions = new Set();
   let hasSeenWhiteZoneIntro = false;
-  let hasSeenGazikiIntro = false;
 
   // направления и типы труб
   const DIRS = {
@@ -58,43 +61,43 @@ document.addEventListener('DOMContentLoaded', () => {
   const FINANCE_QUESTIONS = [
     {
       q: "Что лучше всего делать с кредитной картой, чтобы не переплачивать?",
-      answers: [
-        { text: "Снимать с неё наличные при каждой возможности", correct: false },
-        { text: "Оплачивать покупки полностью каждый месяц", correct: true },
-        { text: "Использовать только половину лимита карты", correct: false }
-      ]
-    },
-    {
-      q: "Что из этого является инвестициями?",
-      answers: [
-        { text: "Покупка акций компании", correct: true },
-        { text: "Покупка нового смартфона", correct: false },
-        { text: "Оплата ежемесячного мобильного тарифа", correct: false }
-      ]
-    },
-    {
-      q: "Что выгоднее: дебетовая карта с кешбэком или кредитная?",
-      answers: [
-        { text: "Дебетовая с кешбэком для повседневных трат", correct: true },
-        { text: "Кредитная для всех покупок", correct: false },
-        { text: "Не важно, главное красивая карта", correct: false }
-      ]
-    },
-    {
-      q: "Почему важно иметь финансовую подушку безопасности?",
-      answers: [
-        { text: "Чтобы тратить больше денег на развлечения", correct: false },
-        { text: "Чтобы иметь средства на непредвиденные расходы", correct: true },
-        { text: "Чтобы брать кредиты чаще", correct: false }
-      ]
-    },
-    {
-      q: "Что такое процент по кредиту?",
-      answers: [
-        { text: "Дополнительная сумма, которую банк начисляет на ваш долг", correct: true },
-        { text: "Скидка за быстрое погашение кредита", correct: false },
-        { text: "Ежемесячная комиссия за использование карты", correct: false }
-      ]
+            answers: [
+              { text: "Снимать с неё наличные при каждой возможности", correct: false },
+              { text: "Оплачивать покупки полностью каждый месяц", correct: true },
+              { text: "Использовать только половину лимита карты", correct: false }
+            ]
+          },
+          {
+            q: "Что из этого является инвестициями?",
+            answers: [
+              { text: "Покупка акций компании", correct: true },
+              { text: "Покупка нового смартфона", correct: false },
+              { text: "Оплата ежемесячного мобильного тарифа", correct: false }
+            ]
+          },
+          {
+            q: "Что выгоднее: дебетовая карта с кешбэком или кредитная?",
+            answers: [
+              { text: "Дебетовая с кешбэком для повседневных трат", correct: true },
+              { text: "Кредитная для всех покупок", correct: false },
+              { text: "Не важно, главное красивая карта", correct: false }
+            ]
+          },
+          {
+            q: "Почему важно иметь финансовую подушку безопасности?",
+            answers: [
+              { text: "Чтобы тратить больше денег на развлечения", correct: false },
+              { text: "Чтобы иметь средства на непредвиденные расходы", correct: true },
+              { text: "Чтобы брать кредиты чаще", correct: false }
+            ]
+          },
+          {
+            q: "Что такое процент по кредиту?",
+            answers: [
+              { text: "Дополнительная сумма, которую банк начисляет на ваш долг", correct: true },
+              { text: "Скидка за быстрое погашение кредита", correct: false },
+              { text: "Ежемесячная комиссия за использование карты", correct: false }
+            ]
     }
   ];
 
@@ -157,7 +160,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Старт и финиш
-    const start = getCell(7, 0);
+    const start = getCell(6, 0);
     start.classList.add('start');
     renderPipe(start, 'H', { fixed: true });
 
@@ -168,14 +171,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Белые зоны
     placeWhiteZones();
 
+
     // Обновление интерфейса
     updateHUD();
+    adjustLayoutForViewport();
+    window.addEventListener('resize', adjustLayoutForViewport);
   }
 
   // Размещение белых зон
   function placeWhiteZones() {
     const whitePositions = [
-      [0, 0], [2, 2], [6, 2], [7, 4]
+      [5, 2], [4, 1], [3, 3], [2, 0], [1, 3], [3, 4]
     ];
 
     whitePositions.forEach(([r, c]) => {
@@ -191,7 +197,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // Выбор трубы
   window.choosePipe = function(type) {
     selectedPipeType = type;
-    document.querySelectorAll("#pipeChoice .btn").forEach(btn => {
+    // Обновляем обе панели выбора труб (десктопную и мобильную)
+    document.querySelectorAll("#pipeChoice .btn, .pipe-buttons-mobile .btn").forEach(btn => {
       btn.classList.remove("active");
       if (btn.dataset.type === type) {
         btn.classList.add("active");
@@ -200,35 +207,41 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   // Проверка возможности установки трубы
-  function canPlacePipe(r, c, type) {
+  function hasAdjacentPipe(r, c) {
+    for (const dir of DIR_KEYS) {
+      const [dr, dc] = DIRS[dir];
+      const neigh = getCell(r + dr, c + dc);
+      if (!neigh) continue;
+      if (neigh.dataset.pipe || neigh.classList.contains('start')) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Проверяем корректность стыковки с соседями
+  function canConnectPipe(r, c, type) {
     if (!TYPE_DEFS[type]) return false;
     const dirs = getPipeDirsFromType(type);
-
     const targetCell = getCell(r, c);
-    if (targetCell && targetCell.dataset.pipeFixed) return false;
+    if (!targetCell || targetCell.dataset.pipeFixed) return false;
 
     for (const dir of dirs) {
       const [dr, dc] = DIRS[dir];
       const neigh = getCell(r + dr, c + dc);
-      if (!neigh) continue;
-      if (!neigh.dataset.pipe) continue;
+      if (!neigh || !neigh.dataset.pipe) continue;
       const neighDirs = getPipeDirsFromCell(neigh);
       const opp = OPP[dir];
-      if (!neighDirs.includes(opp)) {
-        return false;
-      }
+      if (!neighDirs.includes(opp)) return false;
     }
 
     for (const dirKey of DIR_KEYS) {
       const [dr, dc] = DIRS[dirKey];
       const neigh = getCell(r + dr, c + dc);
-      if (!neigh) continue;
-      if (!neigh.dataset.pipe) continue;
+      if (!neigh || !neigh.dataset.pipe) continue;
       const neighDirs = getPipeDirsFromCell(neigh);
       const opp = OPP[dirKey];
-      if (neighDirs.includes(opp) && !dirs.includes(dirKey)) {
-        return false;
-      }
+      if (neighDirs.includes(opp) && !dirs.includes(dirKey)) return false;
     }
 
     return true;
@@ -241,7 +254,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (cell.classList.contains('start') || cell.classList.contains('goal')) return;
 
     if (cell.dataset.pipe) {
-      cell.animate([{transform:'scale(1)'},{transform:'scale(1.04)'},{transform:'scale(1)'}],{duration:180});
+      cell.animate([{transform:'scale(1)'},{transform:'scale(1.04)'},{transform:'scale(1)'}], {duration:180});
       return;
     }
 
@@ -250,7 +263,14 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    if (!canPlacePipe(r, c, selectedPipeType)) {
+    // Сначала проверяем соседство
+    if (!hasAdjacentPipe(r, c)) {
+      alert('Нельзя ставить трубу сюда: нет соседней трубы или стартовой клетки!');
+      return;
+    }
+
+    // Проверяем корректность стыковки
+    if (!canConnectPipe(r, c, selectedPipeType)) {
       alert('Эта труба не стыкуется с соседними!');
       return;
     }
@@ -273,8 +293,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-
-  // Введение в белую зону
+  // Введение про белую зону
   function showWhiteZoneIntro(cell) {
     hasSeenWhiteZoneIntro = true;
     whiteZoneIntroModal.setAttribute('aria-hidden', 'false');
@@ -303,30 +322,25 @@ document.addEventListener('DOMContentLoaded', () => {
     question.answers.forEach(opt => {
       const btn = document.createElement('button');
       btn.textContent = opt.text;
-      btn.className = 'btn';
-
       btn.addEventListener('click', () => {
         quizModal.setAttribute('aria-hidden', 'true');
-
         if (opt.correct) {
           correctAnswers++;
           rubles += 15;
           createFloatingText(cell, '+15 ₽', 'gold');
         } else {
-        createFloatingText(cell, 'Увы :(', '#ff6600');
+          createFloatingText(cell, 'Увы :(', '#ff6600');
         }
-
         updateHUD();
         cell.classList.remove('white-zone');
         checkFlow();
       });
-
       quizAnswers.appendChild(btn);
     });
 
-
     quizModal.setAttribute('aria-hidden', 'false');
   }
+
 
   // Создание всплывающего текста
   function createFloatingText(cell, text, color, className = '') {
@@ -371,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Проверка потока
   function checkFlow() {
-    const start = { r: 7, c: 0 };
+    const start = { r: 6, c: 0 };
     const goal = { r: 0, c: 4 };
     const startKey = `${start.r},${start.c}`;
     const goalKey = `${goal.r},${goal.c}`;
@@ -486,7 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
     localStorage.setItem('fg_rub', rubles);
     localStorage.setItem('fg_gas', finGas);
 
-    resultNote.textContent = `Супер! Тебе опять начислили много Рубликов за успешное прохождение уровня!`;
+    resultNote.textContent = `Так держать! Тебе опять начислили много Рубликов за успешное прохождение уровня!`;
     bonusInfo.innerHTML = `
       <div class="bonus-item">Всего получено: +${totalReward} ₽</div>
       <div class="bonus-item">Базовая награда: +${baseReward} ₽</div>
@@ -504,65 +518,48 @@ document.addEventListener('DOMContentLoaded', () => {
     playerNameEl.textContent = localStorage.getItem('fg_name') || 'Игрок';
   }
 
-  // Диалоги (точный сюжет)
+  // Диалоги
   const DIALOGS = [
-    'Новый уровень – новые приключения!',
-    'В этот раз можешь немного расслабиться, не будет никакого подвоха: ни мошенников, ни соблазна потратить все свои сбережения. ',
-    'Это белая зона бонусов: чтобы получить дополнительные Рублики, тебе нужно выполнить задания. ',
-    'Эта зона никак не влияет на поток ФинГаза, так что если ответишь неправильно - потеряешь только шанс заработать бонусные Рублики. '
+    'Новый уровень – Новые приключения!',
+    'В этот раз можешь немного расслабиться, не будет никакого подвоха: ни мошенников, ни соблазна потратить все свои сбережения.',
+    'Встречай белую зону бонусов: чтобы получить дополнительные Рублики, тебе всё ещё нужно правильно ответить на вопрос.',
+    'Не бойся, эта зона никак не влияет на поток ФинГаза, так что если ответишь неправильно - потеряешь только шанс заработать бонусные Рублики.'
   ];
 
-  nextBtn.addEventListener('click', () => {
-    if (dialogIdx < DIALOGS.length) {
-      dialogText.textContent = DIALOGS[dialogIdx];
-      if (dialogIdx === 2) {
-        // Подсветка белых зон
-        setTimeout(() => {
-          document.querySelectorAll('.white-zone').forEach(cell => {
-            cell.classList.add('tutorial');
-            setTimeout(() => cell.classList.remove('tutorial'), 2000);
-          });
-        }, 500);
+  dialogOverlay.style.display = 'flex';
+  nextBtnOverlay.addEventListener('click', () => {
+      if (dialogIdx < DIALOGS.length) {
+        dialogTextOverlay.textContent = DIALOGS[dialogIdx];
+        if (dialogIdx === 2) {
+          // Подсветка белых зон
+          setTimeout(() => {
+            document.querySelectorAll('.white-zone').forEach(cell => {
+              cell.classList.add('tutorial');
+              setTimeout(() => cell.classList.remove('tutorial'), 2000);
+            });
+          }, 500);
+        }
+        dialogIdx++;
+      } else {
+        // Скрываем диалоговое окно после завершения
+        dialogOverlay.style.display = 'none';
       }
-      dialogIdx++;
-    } else {
-      dialogText.textContent = 'Покоряй свои мечты, герой.';
-      nextBtn.disabled = true;
-      nextBtn.style.display = 'none';
-    }
-  });
+    });
 
-  // Обработчики модальных окон
-  quizClose.addEventListener('click', () => quizModal.setAttribute('aria-hidden', 'true'));
-
-  closeResult.addEventListener('click', () => {
-    resultModal.setAttribute('aria-hidden', 'true');
-    // Показываем сообщение про ежедневные награды
-    setTimeout(() => {
-      dialogText.textContent = "Ты также можешь получать еще больше Рубликов и Газиков в ежедневных наградах.";
-      nextBtn.disabled = false;
-      nextBtn.style.display = 'inline-block';
-      nextBtn.textContent = "Посмотреть награды";
-
-      nextBtn.onclick = () => {
-        dailyModal.setAttribute('aria-hidden', 'false');
-        nextBtn.style.display = 'none';
-      };
-    }, 500);
-  });
 
   closeDaily.addEventListener('click', () => {
     dailyModal.setAttribute('aria-hidden', 'true');
     // Возвращаем в главное меню
     setTimeout(() => {
-      window.location.href = 'index.html';
+      window.location.href = '.../menu/menu.html';
     }, 500);
   });
+
 
   // Обработчик для перехода на следующий уровень
   nextLevelBtn.addEventListener('click', () => {
     dailyModal.setAttribute('aria-hidden', 'true');
-    // Переход на третий уровень
+    // Переход на четвертый уровень
     setTimeout(() => {
       window.location.href = 'level4/level4.html';
     }, 500);
@@ -572,3 +569,23 @@ document.addEventListener('DOMContentLoaded', () => {
   initBoard();
   updateHUD();
 });
+// ДОБАВЬТЕ эту функцию в раздел вспомогательных функций
+function adjustLayoutForViewport() {
+  const viewportHeight = window.innerHeight;
+  const gameArea = document.querySelector('.game-area');
+  const boardContainer = document.querySelector('.board-container');
+  const mobilePanel = document.getElementById('mobilePipePanel');
+
+  // Если высота viewport меньше 700px, включаем компактный режим
+  if (viewportHeight < 700) {
+    document.body.style.overflowY = 'auto';
+    if (boardContainer) {
+      boardContainer.style.padding = '5px';
+    }
+    if (mobilePanel) {
+      mobilePanel.style.minHeight = '60px';
+    }
+  } else {
+    document.body.style.overflowY = 'hidden';
+  }
+}

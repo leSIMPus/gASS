@@ -2,7 +2,16 @@
 <html lang="ru">
 <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#2a7ade">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FinGas">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-TileColor" content="#2a7ade">
+    <meta name="msapplication-tap-highlight" content="no">
     <title>FinGas — Уровень 3</title>
     <link rel="stylesheet" href="css/level3.css">
 </head>
@@ -14,25 +23,28 @@
 </header>
 
 <main class="game-area">
-    <!-- Боковая панель -->
-    <aside class="side-panel">
-        <div class="character">
-            <div class="char-img">Ф</div>
-            <div class="char-name">Финн</div>
-        </div>
-
-        <div class="dialog-box">
-            <p id="dialogText">Замечательная работа на втором уровне!</p>
-            <div style="display:flex;gap:8px;margin-top:8px">
-                <button id="nextBtn" class="btn">Далее</button>
-                <button id="hintBtn" class="btn ghost" title="Подсказка (платно)">Подсказка</button>
+    <!-- Временное диалоговое окно поверх игрового поля -->
+    <div id="dialogOverlay" class="dialog-overlay">
+        <div class="dialog-box-overlay">
+            <div class="character-overlay">
+                <img src="images/finn_head_with_mouth.png" alt="Финн" class="char-img">
+                <div class="char-name">Финн</div>
             </div>
+            <p id="dialogTextOverlay">Замечательная работа на втором уровне!</p>
+            <button id="nextBtnOverlay" class="btn">Далее</button>
         </div>
+    </div>
 
-        <!-- Панель выбора трубы -->
-        <div id="pipeChoice" class="pipe-choice">
+    <!-- Игровое поле -->
+    <section class="board-container">
+        <div id="board" class="board" aria-label="Игровое поле"></div>
+    </section>
+
+    <!-- Мобильная панель выбора труб -->
+    <div id="mobilePipePanel" class="mobile-pipe-panel">
+        <div class="pipe-choice-mobile">
             <p>Выберите трубу:</p>
-            <div class="pipe-buttons">
+            <div class="pipe-buttons-mobile">
                 <button class="btn" data-type="H" onclick="choosePipe('H')">
                     <img src="images/H.png" alt="горизонтальная" class="pipe-img">
                 </button>
@@ -53,68 +65,47 @@
                 </button>
             </div>
         </div>
-
-    </aside>
-
-    <!-- Игровое поле -->
-    <section class="board-container">
-        <div id="board" class="board" aria-label="Игровое поле"></div>
-
-        <!-- Анимационные элементы будут создаваться динамически -->
-    </section>
+    </div>
 </main>
 
-<!-- Модалка с финансовыми вопросами -->
+<!-- Модальные окна -->
 <div id="quizModal" class="modal" aria-hidden="true">
     <div class="modal-content">
         <h3>Белая зона</h3>
         <p id="quizQuestion">Вопрос по финансовой грамотности</p>
         <div class="answers" id="quizAnswers"></div>
-        <div style="margin-top:10px"><button id="quizClose" class="btn ghost">Отмена</button></div>
     </div>
 </div>
 
-<!-- Модалка с продуктами банка -->
-<div id="productModal" class="modal" aria-hidden="true">
-    <div class="modal-content">
-        <h3>Продукт банка</h3>
-        <p id="productText">Ознакомьтесь с продуктом банка</p>
-        <div class="product-info" id="productInfo"></div>
-        <div style="margin-top:10px">
-            <button id="productClose" class="btn">Понятно</button>
-        </div>
-    </div>
-</div>
 
-<!-- Модалка с объяснением белых зон -->
 <div id="whiteZoneIntroModal" class="modal" aria-hidden="true">
     <div class="modal-content">
         <h3>Белая зона</h3>
         <div class="product-info">
-            <p>Это белая зона бонусов: чтобы получить дополнительные Рублики, тебе нужно выполнить задания.</p>
-            <p>Эта зона никак не влияет на поток ФинГаза, так что если ответишь неправильно - потеряешь только шанс заработать бонусные Рублики. </p>
+            <p>Это белая зона. Чтобы получить дополнительные рублики, ответьте правильно на вопрос.</p>
+            <p>Данная зона не несёт никаких угроз: ответив неправильно, вы ничего не потеряете. </p>
         </div>
         <div style="margin-top:10px">
-            <button id="whiteZoneIntroClose" class="btn">Понятно</button>
+            <button id="whiteZoneIntroClose" class="btn">Ясно</button>
         </div>
     </div>
 </div>
 
-<!-- Итог уровня -->
+
 <div id="resultModal" class="modal" aria-hidden="true">
     <div class="modal-content">
-        <h3>Уровень 2 завершён</h3>
+        <h3>Уровень 3 завершён</h3>
         <p id="resultNote"></p>
         <div id="bonusInfo"></div>
-        <div style="margin-top:12px">
-            <button id="closeResult" class="btn">ОК</button>
+        <div style="margin-top:12px; display: flex; gap: 10px; justify-content: center;">
+        <button id="exitToMenu" class="btn ghost">В главное меню</button>
+            <button id="nextLevelResult" class="btn">Следующий уровень</button>
         </div>
     </div>
 </div>
 
-<!-- Ежедневные награды -->
 <div id="dailyModal" class="modal" aria-hidden="true">
-    <div class="modal-content daily-rewards">
+    <div class="modal-content">
         <h3>Ежедневные награды</h3>
         <div class="rewards-grid">
             <div class="reward-day"><span>День 1</span><br>+10 ⚡</div>

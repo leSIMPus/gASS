@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ФинГаз — Меню</title>
+    <link rel="stylesheet" href="menu.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- Дугообразный текст "ФинГаз" -->
+<div id="arc-text-container">
+    <svg viewBox="0 0 600 200">
+        <defs>
+            <path id="arcPath" d="M50,150 A250,250 0 0,1 550,150" />
+        </defs>
+        <text>
+            <textPath xlink:href="#arcPath" startOffset="50%" text-anchor="middle">
+                ФинГаз
+            </textPath>
+        </text>
+    </svg>
+</div>
+
+<div id="game-container">
+    <img id="finn" src="assets/finn_with_mouth.png" alt="Финн">
+
+    <div id="lobby">
+        <div id="lobby-bar">
+            <button class="lobby-btn" id="level-btn">
+                <span id="level-number">1</span>
+            </button>
+            <button class="lobby-btn" id="shop-btn">
+                <img src="assets/shop_icon.png" alt="Магазин">
+            </button>
+            <button class="lobby-btn" id="leaderboard-btn">
+                <img src="assets/leaderboard2.png" alt="Лидерборд">
+            </button>
+        </div>
+    </div>
+
+    <div id="level-popup" style="display: none;">
+        <h2>Выберите уровень</h2>
+        <div id="levels">
+            <button class="level-btn" data-level="1">Уровень 1</button>
+            <button class="level-btn" data-level="2">Уровень 2</button>
+            <button class="level-btn" data-level="3">Уровень 3</button>
+            <button class="level-btn" data-level="4">Уровень 4</button>
+        </div>
+        <button id="close-levels">Назад</button>
+    </div>
+
+    <div id="info-popup" style="display: none;">
+        <div id="info-popup-content">
+            <p>Ой! Технические шоколадки. Загляните позже :)</p>
+            <button id="close-info-popup">Ок</button>
+        </div>
+    </div>
+
+</div>
+
+<script src="menu.js"></script>
+</body>
+</html>
