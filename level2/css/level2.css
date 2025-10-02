@@ -204,16 +204,39 @@ body {
   }
 }
 
-/* СИНИЙ ОГОНЕЧЕК - ВОЗВРАЩАЕМ! */
 .cell.gazik {
   background: #fff;
-  color: #2a7ade;
-  font-weight: 800;
   border: 2px solid #e8f4ff;
   box-shadow: 0 2px 6px rgba(42, 122, 222, 0.15);
-  animation: fire-flicker 1.5s infinite alternate;
+  animation: gazik-pulse 1.5s infinite alternate;
   position: relative;
-  filter: hue-rotate(180deg) saturate(2);
+}
+.cell.gazik::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url('../images/gazik.png');
+  background-size: 70% 70%;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 2;
+}
+@keyframes gazik-pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.05);
+  }
+  50% {
+    transform: scale(0.98);
+  }
+  75% {
+    transform: scale(1.03);
+  }
 }
 
 @keyframes fire-flicker {
