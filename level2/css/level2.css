@@ -132,17 +132,17 @@ body {
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(7, 1fr);
   gap: 2px;
-  /* ПРОСТОЙ И НАДЕЖНЫЙ РАСЧЕТ */
-  width: 90vmin;
-  height: calc(90vmin * 7 / 5);
-  max-width: 350px;
-  max-height: 490px;
+  /* ПРОСТОЙ И НАДЕЖНЫЙ РАСЧЕТ - ФИКСИРУЕМ РАЗМЕРЫ */
+  width: min(90vw, 350px);
+  height: min(calc(90vw * 7 / 5), 490px);
   background: #bdcefa;
   border-radius: 8px;
   border: 2px solid rgba(0,0,0,0.05);
   box-shadow: 0 4px 15px rgba(0,0,0,0.05);
   padding: 2px;
   flex-shrink: 0;
+  /* ГАРАНТИЯ КВАДРАТНЫХ КЛЕТОК */
+  aspect-ratio: 5 / 7;
 }
 
 .cell {
@@ -159,8 +159,9 @@ body {
   transition: all 0.2s;
   /* ГАРАНТИЯ КВАДРАТНЫХ КЛЕТОК */
   aspect-ratio: 1 / 1;
+  /* Убеждаемся, что клетки не выходят за границы */
+  overflow: hidden;
 }
-
 
 .cell:hover {
   transform: scale(1.03);
@@ -508,8 +509,6 @@ body {
     touch-action: pan-x pan-y;
   }
 }
-
-/* АДАПТАЦИЯ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ */
 /* АДАПТАЦИЯ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ */
 @media (max-height: 700px) {
   .board-container {
@@ -517,8 +516,8 @@ body {
   }
 
   #board {
-    width: min(85vw, 85vh * 5/7, 320px);
-    height: min(calc(85vw * 7/5), 85vh, 450px);
+    width: min(85vw, 320px);
+    height: min(calc(85vw * 7 / 5), 450px);
   }
 
   .mobile-pipe-panel {
@@ -543,8 +542,8 @@ body {
 /* Для очень маленьких экранов */
 @media (max-height: 600px) {
   #board {
-    width: min(80vw, 80vh * 5/7, 300px);
-    height: min(calc(80vw * 7/5), 80vh, 420px);
+    width: min(80vw, 300px);
+    height: min(calc(80vw * 7 / 5), 420px);
   }
 
   .mobile-pipe-panel {
@@ -568,8 +567,8 @@ body {
 /* Для экстремально маленьких экранов */
 @media (max-height: 500px) {
   #board {
-    width: min(75vw, 75vh * 5/7, 280px);
-    height: min(calc(75vw * 7/5), 75vh, 390px);
+    width: min(75vw, 280px);
+    height: min(calc(75vw * 7 / 5), 390px);
     gap: 1px;
     padding: 1px;
   }
@@ -588,12 +587,12 @@ body {
   }
 }
 
-/* Отключаем скроллинг на больших экранах */
-@media (min-height: 800px) {
-  .board-container {
-    overflow: hidden;
+/* Для ландшафтной ориентации на мобильных */
+@media (max-width: 768px) and (orientation: landscape) {
+  #board {
+    width: min(80vh, 300px);
+    height: min(calc(80vh * 7 / 5), 420px);
   }
-}
 
   .board-container {
     padding: 5px;
