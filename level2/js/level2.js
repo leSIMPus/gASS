@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+doccument.addEventListener('DOMContentLoaded', () => {
   // DOM элементы
   const boardEl = document.getElementById('board');
   const dialogOverlay = document.getElementById('dialogOverlay');
@@ -114,20 +114,24 @@ document.addEventListener('DOMContentLoaded', () => {
   // Продукты банка для газиков
   const BANK_PRODUCTS = [
     {
-      name: "Накопительный счет",
-      description: "До 8% годовых на остаток, пополнение и снятие в любой момент"
+      name: "Газпромбанк Мобайл",
+      description: "Скидка 50% новым абонентам на все годовые тарифы"
     },
     {
-      name: "Инвестиции",
-      description: "Покупка акций и облигаций с доходностью выше вклада"
+      name: "Gazprom Pay",
+      description: "Бесконтактная оплата смартфоном в магазинах и интернете в одно касание. Безопасно, удобно, выгодно"
     },
     {
-      name: "Страхование",
-      description: "Защита здоровья, имущества и финансовых рисков"
+      name: "Умная дебетовая карта 'Мир' ",
+      description: "100% кэшбэк в супермаркетах"
     },
     {
-      name: "Ипотека",
-      description: "Выгодные ставки от 5% на покупку жилья"
+      name: "Премиальная карта Mir Supreme",
+      description: "Кэшбэк на рестораны дополнительно 10%, бесплатные трансферы и бизнес-залы в аэропортах, Ваша выгода от 500 000 в год"
+    },
+    {
+      name: "Пенсионная карта",
+      description: "С заботой о старших. 0 ₽ обслуживание карты без условий, до 17% годовых по накопительному счету"
     }
   ];
 
@@ -476,7 +480,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Проверка потока
   function checkFlow() {
-    const start = { r: 7, c: 0 };
+    const start = { r: 6, c: 0 };
     const goal = { r: 0, c: 4 };
     const startKey = `${start.r},${start.c}`;
     const goalKey = `${goal.r},${goal.c}`;
