@@ -269,7 +269,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   };
 
-  // Проверка возможности установки трубы
+ //проверка
+  function hasAdjacentPipe(r, c) {
+    // Проверяем все четыре направления
+    const neighbors = [
+      {r: r-1, c: c},   // верх
+      {r: r+1, c: c},   // низ
+      {r: r, c: c-1},   // лево
+      {r: r, c: c+1}    // право
+    ];
+
+    for (const neighbor of neighbors) {
+      // Проверяем, что координаты в пределах поля
+      if (neighbor.r >= 0 && neighbor.r < rows && neighbor.c >= 0 && neighbor.c < cols) {
+        const cell = getCell(neighbor.r, neighbor.c);
+
+        // Если клетка существует и у нее есть труба ИЛИ это старт/финиш
+        if (cell && (cell.dataset.pipe || cell.classList.contains('start') || cell.classList.contains('goal'))) {
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
+
   function canPlacePipe(r, c, type) {
     if (!TYPE_DEFS[type]) return false;
     const dirs = getPipeDirsFromType(type);
@@ -309,6 +333,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Обработка клика по клетке
+  // ОБНОВЛЕННАЯ функция onCellClick
   function onCellClick(r, c) {
     const cell = getCell(r, c);
     if (!cell) return;
@@ -324,6 +349,12 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    // ПРОВЕРЯЕМ, ЧТО ЕСТЬ СОСЕДНИЕ ТРУБЫ
+    if (!hasAdjacentPipe(r, c)) {
+      alert('Трубу можно ставить только рядом с другими трубами, стартом или финишем!');
+      return;
+    }
+
     if (!canPlacePipe(r, c, selectedPipeType)) {
       alert('Эта труба не стыкуется с соседними!');
       return;
@@ -336,20 +367,17 @@ document.addEventListener('DOMContentLoaded', () => {
     // Проверка специальных клеток
     if (cell.classList.contains('yellow-zone')) {
       if (!hasSeenYellowZoneIntro) {
-        // Первый раз на желтой зоне - показываем объяснение
         showYellowZoneIntro(cell);
       } else {
         openFinanceQuiz(cell);
       }
     } else if (cell.classList.contains('gazik')) {
       if (!hasSeenGazikiIntro) {
-        // Первый раз на газике - показываем объяснение
         showGazikiIntro(cell);
       } else {
         collectGazik(cell);
       }
     } else {
-      // Обычная клетка - сразу проверяем поток
       checkFlow();
     }
   }
