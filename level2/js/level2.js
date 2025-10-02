@@ -645,7 +645,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   // Обработчики модальных окон
-  quizClose.addEventListener('click', () => quizModal.setAttribute('aria-hidden', 'true'));
 
   nextLevelResult.addEventListener('click', () => {
     resultModal.setAttribute('aria-hidden', 'true');
