@@ -23,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const nextLevelBtn = document.getElementById('nextLevel'); // Новая кнопка
   const playerNameEl = document.getElementById('playerName');
   const nextLevelResult = document.getElementById('nextLevelResult');
+  const exitToMenu = document.getElementById('exitToMenu');
 
   // Новые элементы для обучающих модалок
   const yellowZoneIntroModal = document.getElementById('yellowZoneIntroModal');
@@ -765,11 +766,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 300);
   });
 
-  closeDaily.addEventListener('click', () => {
+  exitToMenu.addEventListener('click', () => {
     dailyModal.setAttribute('aria-hidden', 'true');
     // Возвращаем в главное меню
     setTimeout(() => {
-      window.location.href = 'index.html';
+      window.location.href = '../menu.html';
     }, 500);
   });
 

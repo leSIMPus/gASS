@@ -547,11 +547,11 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-  closeDaily.addEventListener('click', () => {
+  exitToMenu.addEventListener('click', () => {
     dailyModal.setAttribute('aria-hidden', 'true');
     // Возвращаем в главное меню
     setTimeout(() => {
-      window.location.href = '.../menu/menu.html';
+      window.location.href = '../menu.html';
     }, 500);
   });
 
