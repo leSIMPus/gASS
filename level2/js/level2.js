@@ -1,4 +1,4 @@
-doccument.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   // DOM элементы
   const boardEl = document.getElementById('board');
   const dialogOverlay = document.getElementById('dialogOverlay');
@@ -373,6 +373,7 @@ doccument.addEventListener('DOMContentLoaded', () => {
 
   // Финансовый квиз
   // Финансовый квиз
+  // Финансовый квиз - ОБНОВЛЕННЫЕ КНОПКИ КАК В 3 УРОВНЕ
   function openFinanceQuiz(cell) {
     const availableQuestions = FINANCE_QUESTIONS.filter(q => !usedQuestions.has(q.q));
 
@@ -389,12 +390,7 @@ doccument.addEventListener('DOMContentLoaded', () => {
     question.answers.forEach(opt => {
       const btn = document.createElement('button');
       btn.textContent = opt.text;
-      btn.className = 'btn-answer'; // Добавляем специальный класс
-      if (opt.correct) {
-        btn.classList.add('correct-answer');
-      } else {
-        btn.classList.add('incorrect-answer');
-      }
+      // УБИРАЕМ специальные классы и оставляем обычную кнопку
       btn.addEventListener('click', () => {
         quizModal.setAttribute('aria-hidden', 'true');
         if (opt.correct) {
