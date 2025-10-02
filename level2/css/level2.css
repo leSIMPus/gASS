@@ -91,20 +91,19 @@ body {
 }
 
 .character-overlay .char-img {
-  width: 50px;
-  height: 50px;
+  width: 100px;
+  height: 100px;
   border-radius: 10px;
   display: block;
   margin: 0 auto 6px;
   object-fit: cover;
   border: 2px solid rgba(255,255,255,0.3);
-  background: linear-gradient(135deg, var(--accent), var(--extra));
   padding: 2px;
 }
 
 .character-overlay .char-name {
   font-weight: 700;
-  color: var(--accent);
+  color: #ff6600;
   font-size: 14px;
 }
 
