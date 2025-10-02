@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', () => {
   // DOM элементы
   const boardEl = document.getElementById('board');
+  const dialogOverlay = document.getElementById('dialogOverlay');
+  const dialogTextOverlay = document.getElementById('dialogTextOverlay');
+  const nextBtnOverlay = document.getElementById('nextBtnOverlay');
   const dialogText = document.getElementById('dialogText');
   const nextBtn = document.getElementById('nextBtn');
   const rublesEl = document.getElementById('rubles');
@@ -27,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const gazikIntroClose = document.getElementById('gazikIntroClose');
 
   // состояние игры
-  const rows = 8, cols = 5;
+  const rows = 7, cols = 5;
   let grid = [];
   let selectedPipeType = null;
   let rubles = Number(localStorage.getItem('fg_rub')) || 0;
@@ -186,7 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Старт и финиш
-    const start = getCell(7, 0);
+    const start = getCell(6, 0);
     start.classList.add('start');
     renderPipe(start, 'H', { fixed: true });
 
@@ -207,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Размещение желтых зон
   function placeYellowZones() {
     const yellowPositions = [
-      [6, 2], [5, 1], [4, 3], [3, 2], [2, 0], [1, 3]
+      [5, 2], [4, 1], [3, 3], [2, 0], [1, 3], [3, 4]
     ];
 
     yellowPositions.forEach(([r, c]) => {
@@ -220,16 +223,19 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Создание газиков
+  // Создание газиков - ТОЛЬКО 2 ГАЗИКА
   function spawnGazik() {
     document.querySelectorAll('.cell.gazik').forEach(cell => {
       cell.classList.remove('gazik');
       cell.textContent = '';
     });
 
-    const gazikCount = Math.floor(Math.random() * 2) + 2;
-    let placed = 0;
+    const gazikCount = 2; // Фиксированно 2 газика
 
-    while (placed < gazikCount) {
+    let placed = 0;
+    const maxAttempts = 50; // Защита от бесконечного цикла
+
+    while (placed < gazikCount && maxAttempts > 0) {
       const r = Math.floor(Math.random() * rows);
       const c = Math.floor(Math.random() * cols);
       const cell = getCell(r, c);
@@ -237,7 +243,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (cell && !cell.dataset.pipe &&
           !cell.classList.contains('start') &&
           !cell.classList.contains('goal') &&
-          !cell.classList.contains('yellow-zone')) {
+          !cell.classList.contains('yellow-zone') &&
+          !cell.classList.contains('gazik')) {
         cell.classList.add('gazik');
         cell.textContent = '🔥';
         placed++;
@@ -361,6 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Финансовый квиз
+  // Финансовый квиз
   function openFinanceQuiz(cell) {
     const availableQuestions = FINANCE_QUESTIONS.filter(q => !usedQuestions.has(q.q));
 
@@ -377,7 +385,12 @@ document.addEventListener('DOMContentLoaded', () => {
     question.answers.forEach(opt => {
       const btn = document.createElement('button');
       btn.textContent = opt.text;
-      btn.className = 'btn';
+      btn.className = 'btn-answer'; // Добавляем специальный класс
+      if (opt.correct) {
+        btn.classList.add('correct-answer');
+      } else {
+        btn.classList.add('incorrect-answer');
+      }
       btn.addEventListener('click', () => {
         quizModal.setAttribute('aria-hidden', 'true');
         if (opt.correct) {
@@ -602,31 +615,32 @@ document.addEventListener('DOMContentLoaded', () => {
   const DIALOGS = [
     'Ты прекрасно справился с первым уровнем: не дал мошенникам себя обмануть и сохранил большую часть ФинГаза!',
     'Но все не так просто, впереди тебя ждут новые испытания.',
-    '*появляется желтая зона потерь*',
     'В этот раз ты попал в желтую зону. Зона будет всячески поддалкивать тебя неграмотно распорядится финансами,',
     'твоя же задача - обуздать свои желания и правильно распорядится ресурсами, ответив на вопросы по финансовой грамотности.',
     'Повторюсь, если ты неправильно ответишь на вопросы, то потеряешь часть ФинГаза.'
   ];
 
-  nextBtn.addEventListener('click', () => {
-    if (dialogIdx < DIALOGS.length) {
-      dialogText.textContent = DIALOGS[dialogIdx];
-      if (dialogIdx === 2) {
-        // Подсветка желтых зон
-        setTimeout(() => {
-          document.querySelectorAll('.yellow-zone').forEach(cell => {
-            cell.classList.add('tutorial');
-            setTimeout(() => cell.classList.remove('tutorial'), 2000);
-          });
-        }, 500);
+  dialogOverlay.style.display = 'flex';
+  nextBtnOverlay.addEventListener('click', () => {
+      if (dialogIdx < DIALOGS.length) {
+        dialogTextOverlay.textContent = DIALOGS[dialogIdx];
+        if (dialogIdx === 2) {
+          // Подсветка желтых зон
+          setTimeout(() => {
+            document.querySelectorAll('.yellow-zone').forEach(cell => {
+              cell.classList.add('tutorial');
+              setTimeout(() => cell.classList.remove('tutorial'), 2000);
+            });
+          }, 500);
+        }
+        dialogIdx++;
+      } else {
+        // Скрываем диалоговое окно после завершения
+        dialogOverlay.style.display = 'none';
       }
-      dialogIdx++;
-    } else {
-      dialogText.textContent = 'Теперь попробуй построить путь к мечте!';
-      nextBtn.disabled = true;
-      nextBtn.style.display = 'none';
-    }
-  });
+    });
+
+
 
   // Обработчики модальных окон
   quizClose.addEventListener('click', () => quizModal.setAttribute('aria-hidden', 'true'));
