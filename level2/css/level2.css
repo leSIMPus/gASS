@@ -18,17 +18,16 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  /* ВОЗВРАЩАЕМ overflow: hidden для основного контента */
-  overflow: hidden;
 }
 
 body {
   font-family: Inter, Arial, sans-serif;
   background: linear-gradient(180deg, var(--bg1), var(--bg2));
   color: #0e2b36;
-  /* Используем flex для правильного распределения пространства */
-  display: flex;
-  flex-direction: column;
+  /* Разрешаем скроллинг только когда нужно */
+  overflow-y: auto;
+  /* Минимальная высота - весь экран */
+  min-height: 100vh;
 }
 
 .hud {
@@ -42,7 +41,10 @@ body {
   flex-wrap: wrap;
   font-size: 14px;
   height: 50px;
-  flex-shrink: 0; /* Не сжимаем HUD */
+  /* Фиксируем HUD вверху */
+  position: sticky;
+  top: 0;
+  z-index: 100;
 }
 
 .hud-item {
@@ -56,9 +58,9 @@ body {
 .game-area {
   display: flex;
   flex-direction: column;
-  flex: 1; /* Занимаем все оставшееся пространство */
+  /* Изменяем высоту на автоматическую */
+  min-height: calc(100vh - 50px);
   position: relative;
-  min-height: 0; /* Важно для flex-контейнера */
 }
 
 /* Диалоговое окно поверх игрового поля */
@@ -115,7 +117,8 @@ body {
   margin: 0 0 12px 0;
   color: #333;
 }
-/* Игровое поле - ГАРАНТИРУЕМ КВАДРАТНЫЕ КЛЕТКИ */
+
+/* Игровое поле - ВОЗВРАЩАЕМ РАЗМЕРЫ ВТОРОГО УРОВНЯ */
 .board-container {
   flex: 1;
   display: flex;
@@ -124,7 +127,6 @@ body {
   width: 100%;
   padding: 10px;
   min-height: 0;
-  overflow: auto;
 }
 
 #board {
@@ -132,17 +134,15 @@ body {
   grid-template-columns: repeat(5, 1fr);
   grid-template-rows: repeat(7, 1fr);
   gap: 2px;
-  /* ПРОСТОЙ И НАДЕЖНЫЙ РАСЧЕТ */
-  width: 90vmin;
-  height: calc(90vmin * 7 / 5);
+  width: 90vw;
   max-width: 350px;
+  height: calc((90vw * 7 / 5));
   max-height: 490px;
-  background: #bdcefa;
+  background: #bdcefa; /* ЦВЕТ ПОЛЯ КАК В 3 УРОВНЕ */
   border-radius: 8px;
   border: 2px solid rgba(0,0,0,0.05);
   box-shadow: 0 4px 15px rgba(0,0,0,0.05);
   padding: 2px;
-  flex-shrink: 0;
 }
 
 .cell {
@@ -150,15 +150,13 @@ body {
   align-items: center;
   justify-content: center;
   font-size: 16px;
-  background: #dee1ee;
+  background: #dee1ee; /* ЦВЕТ КЛЕТОК КАК В 3 УРОВНЕ */
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 4px;
   color: var(--accent);
   user-select: none;
   position: relative;
   transition: all 0.2s;
-  /* ГАРАНТИЯ КВАДРАТНЫХ КЛЕТОК */
-  aspect-ratio: 1 / 1;
 }
 
 .cell:hover {
@@ -261,14 +259,19 @@ body {
   box-shadow: inset 0 2px 0 rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.04);
 }
 
-/* Мобильная панель выбора труб - ФИКСИРОВАННАЯ ВЫСОТА */
+/* Мобильная панель выбора труб */
 .mobile-pipe-panel {
   width: 100%;
   padding: 8px 12px;
   background: #fff;
   border-top: 2px solid #e0e0e0;
-  flex-shrink: 0; /* Не сжимаем панель */
-  height: 70px; /* Фиксированная высота */
+  flex-shrink: 0;
+  height: auto; /* Меняем фиксированную высоту на авто */
+  min-height: 70px;
+  /* Фиксируем панель внизу когда нужно */
+  position: sticky;
+  bottom: 0;
+  z-index: 90;
 }
 
 .pipe-choice-mobile p {
@@ -508,88 +511,27 @@ body {
   }
 }
 
-/* АДАПТАЦИЯ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ */
-/* АДАПТАЦИЯ ДЛЯ МАЛЕНЬКИХ ЭКРАНОВ */
 @media (max-height: 700px) {
   .board-container {
     padding: 5px;
   }
 
   #board {
-    width: min(85vw, 85vh * 5/7, 320px);
-    height: min(calc(85vw * 7/5), 85vh, 450px);
+    max-height: 400px;
   }
 
   .mobile-pipe-panel {
     padding: 6px 10px;
-    height: 60px;
   }
 
   .pipe-buttons-mobile .btn {
     min-height: 35px;
   }
-
-  .pipe-choice-mobile p {
-    margin: 0 0 4px;
-    font-size: 13px;
-  }
-
-  .cell {
-    font-size: 14px;
-  }
 }
 
-/* Для очень маленьких экранов */
-@media (max-height: 600px) {
-  #board {
-    width: min(80vw, 80vh * 5/7, 300px);
-    height: min(calc(80vw * 7/5), 80vh, 420px);
-  }
-
-  .mobile-pipe-panel {
-    height: 55px;
-  }
-
-  .pipe-buttons-mobile .btn {
-    min-height: 32px;
-  }
-
-  .pipe-buttons-mobile .btn img.pipe-img {
-    width: 18px;
-    height: 18px;
-  }
-
-  .cell {
-    font-size: 13px;
-  }
-}
-
-/* Для экстремально маленьких экранов */
-@media (max-height: 500px) {
-  #board {
-    width: min(75vw, 75vh * 5/7, 280px);
-    height: min(calc(75vw * 7/5), 75vh, 390px);
-    gap: 1px;
-    padding: 1px;
-  }
-
-  .mobile-pipe-panel {
-    height: 50px;
-    padding: 4px 8px;
-  }
-
-  .pipe-buttons-mobile {
-    gap: 2px;
-  }
-
-  .cell {
-    font-size: 12px;
-  }
-}
-
-/* Отключаем скроллинг на больших экранах */
+/* ДОБАВЛЯЕМ для предотвращения скролла когда все помещается */
 @media (min-height: 800px) {
-  .board-container {
-    overflow: hidden;
+  body {
+    overflow-y: hidden;
   }
 }
